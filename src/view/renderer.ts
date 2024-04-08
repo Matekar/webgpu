@@ -1,11 +1,14 @@
 import { Material } from "./material";
 import unlitShader from "./shaders/basic.wgsl";
 import wireframeShader from "./shaders/wireframe.wgsl";
-import { TriangleMesh } from "./triangleMesh";
-import { QuadMesh } from "./quadMesh";
-import { CubeMesh } from "./cubeMesh";
 import { mat4 } from "gl-matrix";
 import { objectTypes, RenderData } from "../model/definitions";
+import { BasicMesh } from "./basicMesh";
+import {
+  cubeVertices,
+  quadVertices,
+  triangleVertices,
+} from "./assets/vertices";
 
 export class Renderer {
   canvas: HTMLCanvasElement;
@@ -37,9 +40,9 @@ export class Renderer {
   depthStencilAttachment!: GPURenderPassDepthStencilAttachment;
 
   // assets
-  triangleMesh!: TriangleMesh;
-  quadMesh!: QuadMesh;
-  cubeMesh!: CubeMesh;
+  triangleMesh!: BasicMesh;
+  quadMesh!: BasicMesh;
+  cubeMesh!: BasicMesh;
   triangleMaterial!: Material;
   quadMaterial!: Material;
   blankMaterial!: Material;
@@ -221,13 +224,13 @@ export class Renderer {
   };
 
   _createAssets = async () => {
-    this.triangleMesh = new TriangleMesh(this.device);
+    this.triangleMesh = new BasicMesh(this.device, triangleVertices);
     this.triangleMaterial = new Material();
 
-    this.quadMesh = new QuadMesh(this.device);
+    this.quadMesh = new BasicMesh(this.device, quadVertices);
     this.quadMaterial = new Material();
 
-    this.cubeMesh = new CubeMesh(this.device);
+    this.cubeMesh = new BasicMesh(this.device, cubeVertices);
     this.blankMaterial = new Material();
 
     this.uniformBuffer = this.device.createBuffer({
