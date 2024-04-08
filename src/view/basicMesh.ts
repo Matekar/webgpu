@@ -1,6 +1,12 @@
-export class BasicMesh {
+import { Mesh } from "../interfaces/Mesh";
+import { VERTEX_LENGTH } from "./assets/vertices";
+
+export class BasicMesh implements Mesh {
   buffer: GPUBuffer;
   bufferLayout: GPUVertexBufferLayout;
+
+  vertexSize: number;
+  vertexCount: number;
 
   constructor(device: GPUDevice, vertices: Float32Array) {
     const usage: GPUBufferUsageFlags =
@@ -32,5 +38,8 @@ export class BasicMesh {
         },
       ],
     };
+
+    this.vertexSize = VERTEX_LENGTH;
+    this.vertexCount = vertices.length / VERTEX_LENGTH;
   }
 }

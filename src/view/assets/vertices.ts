@@ -84,4 +84,10 @@ const toLineList = (vertices: Float32Array): Float32Array => {
   return new Float32Array(lineList);
 };
 
-export { triangleVertices, quadVertices, cubeVertices, toLineList };
+export {
+  triangleVertices,
+  quadVertices,
+  cubeVertices,
+  toLineList,
+  VERTEX_LENGTH,
+};

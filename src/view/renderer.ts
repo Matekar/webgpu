@@ -380,21 +380,21 @@ export class Renderer {
     renderpass.setVertexBuffer(0, this.triangleMesh.buffer);
     renderpass.setBindGroup(1, this.triangleMaterial.bindGroup);
     // prettier-ignore
-    renderpass.draw(this.vertexMultiplier * triangleVertices.length / 6, renderables.objectCounts[objectTypes.TRIANGLE], 0, objectsDrawn);
+    renderpass.draw(this.vertexMultiplier * this.triangleMesh.vertexSize, renderables.objectCounts[objectTypes.TRIANGLE], 0, objectsDrawn);
     objectsDrawn += renderables.objectCounts[objectTypes.TRIANGLE];
 
     // Quads
     renderpass.setVertexBuffer(0, this.quadMesh.buffer);
     renderpass.setBindGroup(1, this.quadMaterial.bindGroup);
     // prettier-ignore
-    renderpass.draw(this.vertexMultiplier * quadVertices.length / 6, renderables.objectCounts[objectTypes.QUAD], 0, objectsDrawn);
+    renderpass.draw(this.vertexMultiplier * this.quadMesh.vertexSize, renderables.objectCounts[objectTypes.QUAD], 0, objectsDrawn);
     objectsDrawn += renderables.objectCounts[objectTypes.QUAD];
 
     // Cube
     renderpass.setVertexBuffer(0, this.cubeMesh.buffer);
     renderpass.setBindGroup(1, this.blankMaterial.bindGroup);
     //prettier-ignore
-    renderpass.draw(this.vertexMultiplier * cubeVertices.length / 6, 1, 0, objectsDrawn);
+    renderpass.draw(this.vertexMultiplier * this.cubeMesh.vertexSize, 1, 0, objectsDrawn);
     objectsDrawn += 1;
 
     renderpass.end();
