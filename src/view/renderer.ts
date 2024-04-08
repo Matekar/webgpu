@@ -7,6 +7,7 @@ import { BasicMesh } from "./basicMesh";
 import {
   cubeVertices,
   quadVertices,
+  toLineList,
   triangleVertices,
 } from "./assets/vertices";
 
@@ -67,7 +68,8 @@ export class Renderer {
     await this._setupDevice();
     await this._makeBindGroupLayouts();
     this._createShaderModules();
-    await this._createAssets();
+    await this._createMeshes();
+    await this._createMaterials();
     await this._makeDepthBufferResources();
     await this._makePipeline();
     await this._makeWireframePipeline();
@@ -234,14 +236,29 @@ export class Renderer {
     });
   };
 
-  _createAssets = async () => {
-    this.triangleMesh = new BasicMesh(this.device, triangleVertices);
+  _createMeshes = async () => {
+    switch (this.renderMode) {
+      case RenderMode.UNLIT:
+        this.triangleMesh = new BasicMesh(this.device, triangleVertices);
+        this.quadMesh = new BasicMesh(this.device, quadVertices);
+        this.cubeMesh = new BasicMesh(this.device, cubeVertices);
+        break;
+
+      case RenderMode.WIREFRAME:
+        //prettier-ignore
+        this.triangleMesh = new BasicMesh(this.device, toLineList(triangleVertices));
+        this.quadMesh = new BasicMesh(this.device, toLineList(quadVertices));
+        this.cubeMesh = new BasicMesh(this.device, toLineList(cubeVertices));
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  _createMaterials = async () => {
     this.triangleMaterial = new Material();
-
-    this.quadMesh = new BasicMesh(this.device, quadVertices);
     this.quadMaterial = new Material();
-
-    this.cubeMesh = new BasicMesh(this.device, cubeVertices);
     this.blankMaterial = new Material();
 
     this.uniformBuffer = this.device.createBuffer({
