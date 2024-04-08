@@ -28,7 +28,7 @@ export class BasicMesh {
         {
           shaderLocation: 1,
           format: "float32x2",
-          offset: 12,
+          offset: 16,
         },
       ],
     };
