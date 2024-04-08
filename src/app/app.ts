@@ -74,16 +74,9 @@ export class App {
           : 0)
     );
 
-    // FIXME: move to dedicated printDebugInfo or smth
-    this.cameraPositionLabel.innerHTML =
-      "Camera position: " +
-      Math.floor((this.scene.player.position[0] + Number.EPSILON) * 100) / 100 +
-      ", " +
-      Math.floor((this.scene.player.position[1] + Number.EPSILON) * 100) / 100 +
-      ", " +
-      Math.floor((this.scene.player.position[2] + Number.EPSILON) * 100) / 100;
-
     this.renderer.render(this.scene.getRenderables());
+
+    this._printDebugInfo();
 
     if (running) {
       requestAnimationFrame(this.run);
@@ -104,15 +97,14 @@ export class App {
     }
 
     this.moveMap.set(event.code, true);
-    this._printKeys();
   }
 
   _handleKeyup(event: KeyboardEvent) {
     this.moveMap.set(event.code, false);
-    this._printKeys();
   }
 
   _handleMousemove(event: MouseEvent) {
+    // FIXME: move to _printDebugInfo
     this.mouseXLabel.innerText =
       "Mouse X acceleration: " + event.movementX.toString();
     this.mouseYLabel.innerText =
@@ -121,12 +113,19 @@ export class App {
     this.scene.spinPlayer(event.movementX * 0.2, event.movementY * 0.2);
   }
 
-  // FIXME: Change to printDebugInfo that'll show everything
-  _printKeys = () => {
+  _printDebugInfo = () => {
     this.keyLabel.innerText = "Current keys: [";
     this.moveMap.forEach(
       (v, k) => (this.keyLabel.innerText += v ? k + " " : "")
     );
     this.keyLabel.innerText += "]";
+
+    this.cameraPositionLabel.innerHTML =
+      "Camera position: " +
+      Math.floor((this.scene.player.position[0] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.position[1] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.position[2] + Number.EPSILON) * 100) / 100;
   };
 }
