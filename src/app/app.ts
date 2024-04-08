@@ -96,12 +96,12 @@ export class App {
       return;
     }
 
-    // if (event.code.startsWith("Digit")) {
-    //   if (event.code === "Digit1")
-    //     this.renderer.switchPipeline(RenderMode.UNLIT);
-    //   else if (event.code === "Digit2")
-    //     this.renderer.switchPipeline(RenderMode.WIREFRAME);
-    // }
+    if (event.code.startsWith("Digit")) {
+      if (event.code === "Digit1")
+        this.renderer.switchPipeline(RenderMode.UNLIT);
+      else if (event.code === "Digit2")
+        this.renderer.switchPipeline(RenderMode.WIREFRAME);
+    }
 
     this.moveMap.set(event.code, true);
     this._printKeys();

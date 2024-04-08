@@ -2,7 +2,7 @@ import { Material } from "./material";
 import unlitShader from "./shaders/basic.wgsl";
 import wireframeShader from "./shaders/wireframe.wgsl";
 import { mat4 } from "gl-matrix";
-import { objectTypes, RenderData } from "../model/definitions";
+import { objectTypes, RenderData, RenderMode } from "../model/definitions";
 import { BasicMesh } from "./basicMesh";
 import {
   cubeVertices,
@@ -33,6 +33,14 @@ export class Renderer {
   // FIXME: temporary wireframe pipeline
   wireframePipeline!: GPURenderPipeline;
 
+  // Clear value
+  clearValue: GPUColor;
+
+  // Render mode
+  renderMode: RenderMode;
+  // FIXME: [TEMPORARY!] DELETE ASAP
+  vertexMultiplier: number;
+
   // Depth Stencil objects
   depthStencilState!: GPUDepthStencilState;
   depthStencilBuffer!: GPUTexture;
@@ -50,6 +58,9 @@ export class Renderer {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
+    this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
+    this.renderMode = RenderMode.UNLIT;
+    this.vertexMultiplier = 1;
   }
 
   async init() {
@@ -278,7 +289,22 @@ export class Renderer {
   };
 
   // FIXME:
-  switchShader = async (shaderModule: GPUShaderModule) => {};
+  switchPipeline = async (mode: RenderMode) => {
+    if (mode === this.renderMode) return;
+
+    this.renderMode = mode;
+    if (this.renderMode === RenderMode.UNLIT) {
+      this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
+      this.vertexMultiplier = 1;
+      return;
+    }
+
+    if (this.renderMode === RenderMode.WIREFRAME) {
+      this.clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+      this.vertexMultiplier = 2;
+      return;
+    }
+  };
 
   render = async (renderables: RenderData) => {
     const projection = mat4.create();
@@ -315,7 +341,7 @@ export class Renderer {
       colorAttachments: [
         {
           view: textureView,
-          clearValue: { r: 0, g: 0, b: 0, a: 1.0 },
+          clearValue: this.clearValue,
           loadOp: "clear",
           storeOp: "store",
         },
