@@ -39,8 +39,6 @@ export class Renderer {
 
   // Render mode
   renderMode: RenderMode;
-  // FIXME: [TEMPORARY!] DELETE ASAP
-  vertexMultiplier: number;
 
   // Depth Stencil objects
   depthStencilState!: GPUDepthStencilState;
@@ -61,7 +59,6 @@ export class Renderer {
     this.canvas = canvas;
     this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
     this.renderMode = RenderMode.UNLIT;
-    this.vertexMultiplier = 1;
   }
 
   async init() {
@@ -310,13 +307,11 @@ export class Renderer {
     await this._createMeshes();
     if (this.renderMode === RenderMode.UNLIT) {
       this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
-      this.vertexMultiplier = 1;
       return;
     }
 
     if (this.renderMode === RenderMode.WIREFRAME) {
       this.clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
-      this.vertexMultiplier = 2;
       return;
     }
   };
@@ -379,22 +374,29 @@ export class Renderer {
     // Triangles
     renderpass.setVertexBuffer(0, this.triangleMesh.buffer);
     renderpass.setBindGroup(1, this.triangleMaterial.bindGroup);
-    // prettier-ignore
-    renderpass.draw(this.vertexMultiplier * triangleVertices.length / 6, renderables.objectCounts[objectTypes.TRIANGLE], 0, objectsDrawn);
+    renderpass.draw(
+      this.triangleMesh.vertexCount,
+      renderables.objectCounts[objectTypes.TRIANGLE],
+      0,
+      objectsDrawn
+    );
     objectsDrawn += renderables.objectCounts[objectTypes.TRIANGLE];
 
     // Quads
     renderpass.setVertexBuffer(0, this.quadMesh.buffer);
     renderpass.setBindGroup(1, this.quadMaterial.bindGroup);
-    // prettier-ignore
-    renderpass.draw(this.vertexMultiplier * quadVertices.length / 6, renderables.objectCounts[objectTypes.QUAD], 0, objectsDrawn);
+    renderpass.draw(
+      this.quadMesh.vertexCount,
+      renderables.objectCounts[objectTypes.QUAD],
+      0,
+      objectsDrawn
+    );
     objectsDrawn += renderables.objectCounts[objectTypes.QUAD];
 
     // Cube
     renderpass.setVertexBuffer(0, this.cubeMesh.buffer);
     renderpass.setBindGroup(1, this.blankMaterial.bindGroup);
-    //prettier-ignore
-    renderpass.draw(this.vertexMultiplier * cubeVertices.length / 6, 1, 0, objectsDrawn);
+    renderpass.draw(this.cubeMesh.vertexCount, 1, 0, objectsDrawn);
     objectsDrawn += 1;
 
     renderpass.end();
