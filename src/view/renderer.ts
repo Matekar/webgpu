@@ -2,7 +2,7 @@ import { Material } from "./material";
 import unlitShader from "./shaders/basic.wgsl";
 import wireframeShader from "./shaders/wireframe.wgsl";
 import { mat4 } from "gl-matrix";
-import { objectTypes, RenderData, RenderMode } from "../model/definitions";
+import { objectTypes, RenderMode } from "../interfaces/enums";
 import { BasicMesh } from "./basicMesh";
 import {
   cubeVertices,
@@ -10,6 +10,7 @@ import {
   toLineList,
   triangleVertices,
 } from "./assets/vertices";
+import { RenderData } from "../interfaces/RenderData";
 
 export class Renderer {
   canvas: HTMLCanvasElement;

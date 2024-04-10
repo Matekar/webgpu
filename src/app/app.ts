@@ -1,6 +1,6 @@
 import { Renderer } from "../view/renderer";
 import { Scene } from "../model/scene";
-import { RenderMode } from "../model/definitions";
+import { RenderMode } from "../interfaces/enums";
 
 export class App {
   canvas: HTMLCanvasElement;

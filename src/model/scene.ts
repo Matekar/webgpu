@@ -2,7 +2,8 @@ import { Triangle } from "./triangle";
 import { Quad } from "./quad";
 import { Camera } from "./camera";
 import { vec3, mat4 } from "gl-matrix";
-import { objectTypes, RenderData } from "./definitions";
+import { objectTypes } from "../interfaces/enums";
+import { RenderData } from "../interfaces/RenderData";
 
 export class Scene {
   triangles: Triangle[];
