@@ -1,13 +1,15 @@
-import { Triangle } from "./triangle";
-import { Quad } from "./quad";
-import { Camera } from "./camera";
-import { vec3, mat4 } from "gl-matrix";
 import { objectTypes } from "../interfaces/enums";
 import { RenderData } from "../interfaces/RenderData";
 
+import { ZRotatingModel } from "./zRotatingModel";
+import { BasicModel } from "./basicModel";
+import { Camera } from "./camera";
+
+import { vec3, mat4 } from "gl-matrix";
+
 export class Scene {
-  triangles: Triangle[];
-  quads: Quad[];
+  triangles: BasicModel[];
+  quads: BasicModel[];
   player: Camera;
   objectData: Float32Array;
   triangleCount: number;
@@ -31,7 +33,7 @@ export class Scene {
   _makeTriangles = () => {
     let i: number = 0;
     for (let y: number = -5; y <= 5; y++) {
-      this.triangles.push(new Triangle([2, y, 0.5], 0));
+      this.triangles.push(new ZRotatingModel([2, y, 0.5], 0));
 
       const blankMatrix = mat4.create();
       for (let j: number = 0; j < 16; j++)
@@ -46,7 +48,7 @@ export class Scene {
     let i: number = this.triangleCount;
     for (let x: number = -10; x <= 10; x++) {
       for (let y: number = -5; y <= 5; y++) {
-        this.quads.push(new Quad([x, y, 0]));
+        this.quads.push(new BasicModel([x, y, 0]));
 
         const blankMatrix = mat4.create();
         for (let j: number = 0; j < 16; j++)

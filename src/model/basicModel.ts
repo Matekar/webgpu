@@ -1,7 +1,7 @@
 import { mat4, vec3 } from "gl-matrix";
 import { Model } from "../interfaces/Model";
 
-export class basicModel implements Model {
+export class BasicModel implements Model {
   position: vec3;
   eulers: vec3;
   model!: mat4;
@@ -11,12 +11,12 @@ export class basicModel implements Model {
     this.eulers = vec3.create();
   }
 
-  update = () => {
+  update() {
     this.model = mat4.create();
     mat4.translate(this.model, this.model, this.position);
-  };
+  }
 
-  getModel = () => {
+  getModel() {
     return this.model;
-  };
+  }
 }
