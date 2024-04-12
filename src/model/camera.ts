@@ -1,5 +1,5 @@
 import { vec3, mat4 } from "gl-matrix";
-import { deg2rad } from "./mathStuff";
+import { deg2rad } from "../utility/mathUtilities";
 
 export class Camera {
   position: vec3;
