@@ -11,6 +11,8 @@ import {
   triangleVertices,
 } from "./assets/vertices";
 import { RenderData } from "../interfaces/RenderData";
+import { initializeUnlitPipeline } from "./pipes/unlitPipeline";
+import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 
 export class Renderer {
   canvas: HTMLCanvasElement;
@@ -27,12 +29,12 @@ export class Renderer {
 
   // Pipeline objects
   uniformBuffer!: GPUBuffer;
-  pipeline!: GPURenderPipeline;
   frameGroupLayout!: GPUBindGroupLayout;
   materialGroupLayout!: GPUBindGroupLayout;
   frameBindGroup!: GPUBindGroup;
 
-  // FIXME: temporary wireframe pipeline
+  // Pipelines
+  unlitPipeline!: GPURenderPipeline;
   wireframePipeline!: GPURenderPipeline;
 
   // Clear value
@@ -69,8 +71,7 @@ export class Renderer {
     await this._createMeshes();
     await this._createMaterials();
     await this._makeDepthBufferResources();
-    await this._makePipeline();
-    await this._makeWireframePipeline();
+    await this._initializePipelines();
     await this._makeBindGroup();
   }
 
@@ -169,69 +170,22 @@ export class Renderer {
     });
   };
 
-  _makePipeline = async () => {
-    const pipelineLayout = this.device.createPipelineLayout({
-      bindGroupLayouts: [this.frameGroupLayout, this.materialGroupLayout],
-    });
+  _initializePipelines = async () => {
+    this.unlitPipeline = initializeUnlitPipeline(
+      this.device,
+      [this.frameGroupLayout, this.materialGroupLayout],
+      [this.triangleMesh.bufferLayout],
+      this.format,
+      this.depthStencilState
+    );
 
-    this.pipeline = this.device.createRenderPipeline({
-      vertex: {
-        module: this.unlitShaderModule,
-        entryPoint: "vs_main",
-        buffers: [this.triangleMesh.bufferLayout],
-      },
-
-      fragment: {
-        module: this.unlitShaderModule,
-        entryPoint: "fs_main",
-        targets: [
-          {
-            format: this.format,
-          },
-        ],
-      },
-
-      primitive: {
-        topology: "triangle-list",
-      },
-
-      layout: pipelineLayout,
-
-      depthStencil: this.depthStencilState,
-    });
-  };
-
-  // FIXME: temporary wireframe pipeline
-  _makeWireframePipeline = async () => {
-    const pipelineLayout = this.device.createPipelineLayout({
-      bindGroupLayouts: [this.frameGroupLayout],
-    });
-
-    this.wireframePipeline = this.device.createRenderPipeline({
-      vertex: {
-        module: this.wireframeShaderModule,
-        entryPoint: "vs_main",
-        buffers: [this.triangleMesh.bufferLayout],
-      },
-
-      fragment: {
-        module: this.wireframeShaderModule,
-        entryPoint: "fs_main",
-        targets: [
-          {
-            format: this.format,
-          },
-        ],
-      },
-
-      primitive: {
-        topology: "line-list",
-      },
-
-      layout: pipelineLayout,
-
-      depthStencil: this.depthStencilState,
-    });
+    this.wireframePipeline = initializeWireframePipeline(
+      this.device,
+      [this.frameGroupLayout],
+      [this.triangleMesh.bufferLayout],
+      this.format,
+      this.depthStencilState
+    );
   };
 
   _createMeshes = async () => {
@@ -300,7 +254,6 @@ export class Renderer {
     });
   };
 
-  // FIXME:
   switchPipeline = async (mode: RenderMode) => {
     if (mode === this.renderMode) return;
 
@@ -362,7 +315,7 @@ export class Renderer {
 
     switch (this.renderMode) {
       case RenderMode.UNLIT:
-        renderpass.setPipeline(this.pipeline);
+        renderpass.setPipeline(this.unlitPipeline);
         break;
 
       case RenderMode.WIREFRAME:
