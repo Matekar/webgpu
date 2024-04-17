@@ -23,10 +23,6 @@ export class Renderer {
   context!: GPUCanvasContext;
   format!: GPUTextureFormat;
 
-  // Shader modules
-  unlitShaderModule!: GPUShaderModule;
-  wireframeShaderModule!: GPUShaderModule;
-
   // Pipeline objects
   uniformBuffer!: GPUBuffer;
   frameGroupLayout!: GPUBindGroupLayout;
@@ -67,7 +63,6 @@ export class Renderer {
   async init() {
     await this._setupDevice();
     await this._makeBindGroupLayouts();
-    this._createShaderModules();
     await this._createMeshes();
     await this._createMaterials();
     await this._makeDepthBufferResources();
@@ -157,16 +152,6 @@ export class Renderer {
           sampler: {},
         },
       ],
-    });
-  };
-
-  _createShaderModules = () => {
-    this.unlitShaderModule = this.device.createShaderModule({
-      code: unlitShader,
-    });
-
-    this.wireframeShaderModule = this.device.createShaderModule({
-      code: wireframeShader,
     });
   };
 
