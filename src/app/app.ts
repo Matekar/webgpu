@@ -7,10 +7,18 @@ export class App {
   renderer: Renderer;
   scene: Scene;
 
+  // FIXME: reorganize querying HTML Elements do display debug info
+
   keyLabel: HTMLElement;
   mouseXLabel: HTMLElement;
   mouseYLabel: HTMLElement;
   cameraPositionLabel: HTMLElement;
+
+  // camera orientation labels
+  cameraOrientationLabel: HTMLElement;
+  cameraForwardsLabel: HTMLElement;
+  cameraRightLabel: HTMLElement;
+  cameraUpLabel: HTMLElement;
 
   moveMap: Map<String, Boolean>;
   acceleration: number;
@@ -23,9 +31,16 @@ export class App {
     this.keyLabel = <HTMLElement>document.querySelector("#key_label");
     this.mouseXLabel = <HTMLElement>document.querySelector("#mouse_x_label");
     this.mouseYLabel = <HTMLElement>document.querySelector("#mouse_y_label");
-    this.cameraPositionLabel = <HTMLElement>(
-      document.querySelector("#camera_position_label")
-    );
+    // prettier-ignore
+    this.cameraPositionLabel = <HTMLElement>(document.querySelector("#camera_position_label"));
+    // prettier-ignore
+    this.cameraOrientationLabel = <HTMLElement>(document.querySelector("#camera_orientation_label"));
+    // prettier-ignore
+    this.cameraForwardsLabel = <HTMLElement>(document.querySelector("#camera_forwards_label"));
+    // prettier-ignore
+    this.cameraRightLabel = <HTMLElement>(document.querySelector("#camera_right_label"));
+    // prettier-ignore
+    this.cameraUpLabel = <HTMLElement>(document.querySelector("#camera_up_label"));
 
     document.addEventListener("keydown", (event) => this._handleKeydown(event));
     document.addEventListener("keyup", (event) => this._handleKeyup(event));
@@ -127,5 +142,29 @@ export class App {
       Math.floor((this.scene.player.position[1] + Number.EPSILON) * 100) / 100 +
       ", " +
       Math.floor((this.scene.player.position[2] + Number.EPSILON) * 100) / 100;
+
+    this.cameraForwardsLabel.innerHTML =
+      " Forwards: " +
+      Math.floor((this.scene.player.forwards[0] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.forwards[1] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.forwards[2] + Number.EPSILON) * 100) / 100;
+
+    this.cameraRightLabel.innerHTML =
+      " Right: " +
+      Math.floor((this.scene.player.right[0] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.right[1] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.right[2] + Number.EPSILON) * 100) / 100;
+
+    this.cameraUpLabel.innerHTML =
+      " Up: " +
+      Math.floor((this.scene.player.up[0] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.up[1] + Number.EPSILON) * 100) / 100 +
+      ", " +
+      Math.floor((this.scene.player.up[2] + Number.EPSILON) * 100) / 100;
   };
 }
