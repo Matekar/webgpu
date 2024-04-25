@@ -25,7 +25,7 @@ export class App {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.renderer = new Renderer(canvas);
+    this.renderer = new Renderer();
     this.scene = new Scene();
 
     this.keyLabel = <HTMLElement>document.querySelector("#key_label");
