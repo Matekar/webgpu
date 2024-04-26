@@ -1,19 +1,17 @@
 import { Material } from "./material";
-import unlitShader from "./shaders/basic.wgsl";
-import wireframeShader from "./shaders/wireframe.wgsl";
 import { mat4 } from "gl-matrix";
 import { objectTypes, RenderMode } from "../interfaces/enums";
 import { BasicMesh } from "./basicMesh";
 import {
   cubeVertices,
   quadVertices,
-  toLineList,
   triangleVertices,
 } from "./assets/vertices";
 import { RenderData } from "../interfaces/RenderData";
 import { initializeUnlitPipeline } from "./pipes/unlitPipeline";
 import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 import { cUserAgent } from "../app/userAgent";
+import { cMeshLibrary } from "../utility/MeshLibrary";
 
 export class Renderer {
   // Pipeline objects
@@ -39,9 +37,6 @@ export class Renderer {
   depthStencilAttachment!: GPURenderPassDepthStencilAttachment;
 
   // assets
-  triangleMesh!: BasicMesh;
-  quadMesh!: BasicMesh;
-  cubeMesh!: BasicMesh;
   triangleMaterial!: Material;
   quadMaterial!: Material;
   blankMaterial!: Material;
@@ -139,7 +134,7 @@ export class Renderer {
     this.unlitPipeline = initializeUnlitPipeline(
       cUserAgent.device,
       [this.frameGroupLayout, this.materialGroupLayout],
-      [this.triangleMesh.bufferLayout],
+      [cMeshLibrary.get("triangleMesh")!.bufferLayout],
       cUserAgent.format,
       this.depthStencilState
     );
@@ -147,16 +142,16 @@ export class Renderer {
     this.wireframePipeline = initializeWireframePipeline(
       cUserAgent.device,
       [this.frameGroupLayout],
-      [this.triangleMesh.bufferLayout],
+      [cMeshLibrary.get("triangleMesh")!.bufferLayout],
       cUserAgent.format,
       this.depthStencilState
     );
   };
 
   _createMeshes = async () => {
-    this.triangleMesh = new BasicMesh(triangleVertices);
-    this.quadMesh = new BasicMesh(quadVertices);
-    this.cubeMesh = new BasicMesh(cubeVertices);
+    cMeshLibrary.set("triangleMesh", new BasicMesh(triangleVertices));
+    cMeshLibrary.set("quadMesh", new BasicMesh(quadVertices));
+    cMeshLibrary.set("cubeMesh", new BasicMesh(cubeVertices));
   };
 
   _createMaterials = async () => {
@@ -215,19 +210,16 @@ export class Renderer {
     if (mode === this.renderMode) return;
 
     this.renderMode = mode;
+    cMeshLibrary.forEach((mesh, _) => mesh.switchRenderMode(this.renderMode));
 
-    this.triangleMesh.switchRenderMode(this.renderMode);
-    this.quadMesh.switchRenderMode(this.renderMode);
-    this.cubeMesh.switchRenderMode(this.renderMode);
+    switch (this.renderMode) {
+      case RenderMode.UNLIT:
+        this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
+        break;
 
-    if (this.renderMode === RenderMode.UNLIT) {
-      this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
-      return;
-    }
-
-    if (this.renderMode === RenderMode.WIREFRAME) {
-      this.clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
-      return;
+      case RenderMode.WIREFRAME:
+        this.clearValue = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+        break;
     }
   };
 
@@ -291,10 +283,10 @@ export class Renderer {
 
     let objectsDrawn: number = 0;
     // Triangles
-    renderpass.setVertexBuffer(0, this.triangleMesh.buffer);
+    renderpass.setVertexBuffer(0, cMeshLibrary.get("triangleMesh")!.buffer);
     renderpass.setBindGroup(1, this.triangleMaterial.bindGroup);
     renderpass.draw(
-      this.triangleMesh.vertexCount,
+      cMeshLibrary.get("triangleMesh")!.vertexCount,
       renderables.objectCounts[objectTypes.TRIANGLE],
       0,
       objectsDrawn
@@ -302,10 +294,10 @@ export class Renderer {
     objectsDrawn += renderables.objectCounts[objectTypes.TRIANGLE];
 
     // Quads
-    renderpass.setVertexBuffer(0, this.quadMesh.buffer);
+    renderpass.setVertexBuffer(0, cMeshLibrary.get("quadMesh")!.buffer);
     renderpass.setBindGroup(1, this.quadMaterial.bindGroup);
     renderpass.draw(
-      this.quadMesh.vertexCount,
+      cMeshLibrary.get("quadMesh")!.vertexCount,
       renderables.objectCounts[objectTypes.QUAD],
       0,
       objectsDrawn
@@ -313,9 +305,14 @@ export class Renderer {
     objectsDrawn += renderables.objectCounts[objectTypes.QUAD];
 
     // Cube
-    renderpass.setVertexBuffer(0, this.cubeMesh.buffer);
+    renderpass.setVertexBuffer(0, cMeshLibrary.get("cubeMesh")!.buffer);
     renderpass.setBindGroup(1, this.blankMaterial.bindGroup);
-    renderpass.draw(this.cubeMesh.vertexCount, 1, 0, objectsDrawn);
+    renderpass.draw(
+      cMeshLibrary.get("cubeMesh")!.vertexCount,
+      1,
+      0,
+      objectsDrawn
+    );
     objectsDrawn += 1;
 
     renderpass.end();
