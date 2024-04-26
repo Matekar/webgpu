@@ -1,27 +1,31 @@
+import { cUserAgent } from "../app/userAgent";
 import { Mesh } from "../interfaces/Mesh";
 import { VERTEX_LENGTH } from "./assets/vertices";
+import { toLineList } from "./assets/vertices";
 
 export class BasicMesh implements Mesh {
+  _vertexPrimitives: Float32Array;
+
   buffer: GPUBuffer;
   bufferLayout: GPUVertexBufferLayout;
 
   vertexSize: number;
   vertexCount: number;
 
-  constructor(device: GPUDevice, vertices: Float32Array) {
+  constructor(vertices: Float32Array) {
+    this._vertexPrimitives = vertices;
+
     const usage: GPUBufferUsageFlags =
       GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
 
     const descriptor: GPUBufferDescriptor = {
-      size: vertices.byteLength,
+      size: this._vertexPrimitives.byteLength,
       usage,
       mappedAtCreation: true,
     };
 
-    this.buffer = device.createBuffer(descriptor);
-
-    new Float32Array(this.buffer.getMappedRange()).set(vertices);
-    this.buffer.unmap();
+    this.buffer = cUserAgent.device.createBuffer(descriptor);
+    this.toTriangleList();
 
     this.bufferLayout = {
       arrayStride: 24,
@@ -41,5 +45,17 @@ export class BasicMesh implements Mesh {
 
     this.vertexSize = VERTEX_LENGTH;
     this.vertexCount = vertices.length / VERTEX_LENGTH;
+  }
+
+  // toLineList(): void {
+  //   new Float32Array(this.buffer.getMappedRange()).set(
+  //     toLineList(this._vertexPrimitives)
+  //   );
+  //   this.buffer.unmap();
+  // }
+
+  toTriangleList(): void {
+    new Float32Array(this.buffer.getMappedRange()).set(this._vertexPrimitives);
+    this.buffer.unmap();
   }
 }
