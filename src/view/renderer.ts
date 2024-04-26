@@ -154,19 +154,9 @@ export class Renderer {
   };
 
   _createMeshes = async () => {
-    switch (this.renderMode) {
-      case RenderMode.UNLIT:
-        this.triangleMesh = new BasicMesh(triangleVertices);
-        this.quadMesh = new BasicMesh(quadVertices);
-        this.cubeMesh = new BasicMesh(cubeVertices);
-        break;
-
-      case RenderMode.WIREFRAME:
-        this.triangleMesh = new BasicMesh(toLineList(triangleVertices));
-        this.quadMesh = new BasicMesh(toLineList(quadVertices));
-        this.cubeMesh = new BasicMesh(toLineList(cubeVertices));
-        break;
-    }
+    this.triangleMesh = new BasicMesh(triangleVertices);
+    this.quadMesh = new BasicMesh(quadVertices);
+    this.cubeMesh = new BasicMesh(cubeVertices);
   };
 
   _createMaterials = async () => {
@@ -225,7 +215,11 @@ export class Renderer {
     if (mode === this.renderMode) return;
 
     this.renderMode = mode;
-    await this._createMeshes();
+
+    this.triangleMesh.switchRenderMode(this.renderMode);
+    this.quadMesh.switchRenderMode(this.renderMode);
+    this.cubeMesh.switchRenderMode(this.renderMode);
+
     if (this.renderMode === RenderMode.UNLIT) {
       this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
       return;
