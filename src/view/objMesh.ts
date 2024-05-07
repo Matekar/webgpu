@@ -75,7 +75,7 @@ export class ObjMesh implements Mesh {
 
         case "vt":
           const [u, v] = parts.map(parseFloat);
-          this.vt.push(vec2.fromValues(u, v));
+          this.vt.push(vec2.fromValues(u, 1 - v));
           break;
 
         case "vn":
