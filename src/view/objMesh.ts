@@ -1,9 +1,7 @@
 import { vec2, vec3, vec4 } from "gl-matrix";
-import { Mesh } from "../interfaces/Mesh";
 import { RenderMode } from "../interfaces/enums";
-import { VERTEX_LENGTH, toLineList } from "./assets/vertices";
+import { toLineList } from "./assets/vertices";
 import { Face } from "../interfaces/Face";
-import { cUserAgent } from "../app/userAgent";
 import { BasicMesh } from "./basicMesh";
 
 export class ObjMesh extends BasicMesh {
