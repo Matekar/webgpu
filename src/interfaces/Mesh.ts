@@ -1,6 +1,10 @@
+import { RenderMode } from "./enums";
+
 export interface Mesh {
   buffer: GPUBuffer;
   bufferLayout: GPUVertexBufferLayout;
-  vertexSize: Number;
-  vertexCount: Number;
+  vertexSize: number;
+  vertexCount: number;
+
+  switchRenderMode(renderMode: RenderMode): void;
 }

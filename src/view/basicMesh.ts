@@ -1,27 +1,40 @@
+import { cUserAgent } from "../app/userAgent";
 import { Mesh } from "../interfaces/Mesh";
-import { VERTEX_LENGTH } from "./assets/vertices";
+import { RenderMode } from "../interfaces/enums";
+import { VERTEX_LENGTH, toLineList } from "./assets/vertices";
 
 export class BasicMesh implements Mesh {
-  buffer: GPUBuffer;
+  _primitiveTriangleListVertices: Float32Array;
+  _primitiveLineListVertices: Float32Array;
+
+  buffer!: GPUBuffer;
+  bufferUsage: GPUBufferUsageFlags;
   bufferLayout: GPUVertexBufferLayout;
 
-  vertexSize: number;
-  vertexCount: number;
+  vertexSize!: number;
+  vertexCount!: number;
 
-  constructor(device: GPUDevice, vertices: Float32Array) {
-    const usage: GPUBufferUsageFlags =
-      GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
+  renderMode: RenderMode;
 
-    const descriptor: GPUBufferDescriptor = {
-      size: vertices.byteLength,
-      usage,
-      mappedAtCreation: true,
-    };
+  constructor(
+    vertices: Float32Array,
+    renderMode: RenderMode = RenderMode.UNLIT
+  ) {
+    this._primitiveTriangleListVertices = vertices;
+    this._primitiveLineListVertices = toLineList(vertices);
+    this.bufferUsage = GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
 
-    this.buffer = device.createBuffer(descriptor);
+    this.renderMode = renderMode;
 
-    new Float32Array(this.buffer.getMappedRange()).set(vertices);
-    this.buffer.unmap();
+    switch (renderMode) {
+      case RenderMode.UNLIT:
+        this._regenerate(this._primitiveTriangleListVertices);
+        break;
+
+      case RenderMode.WIREFRAME:
+        this._regenerate(this._primitiveLineListVertices);
+        break;
+    }
 
     this.bufferLayout = {
       arrayStride: 24,
@@ -38,8 +51,37 @@ export class BasicMesh implements Mesh {
         },
       ],
     };
+  }
+
+  _regenerate = (vertices: Float32Array): void => {
+    if (this.buffer) this.buffer.destroy();
+
+    const descriptor: GPUBufferDescriptor = {
+      size: vertices.byteLength,
+      usage: this.bufferUsage,
+      mappedAtCreation: true,
+    };
+
+    this.buffer = cUserAgent.device.createBuffer(descriptor);
+    new Float32Array(this.buffer.getMappedRange()).set(vertices);
+    this.buffer.unmap();
 
     this.vertexSize = VERTEX_LENGTH;
     this.vertexCount = vertices.length / VERTEX_LENGTH;
+  };
+
+  switchRenderMode(renderMode: RenderMode): void {
+    if (this.renderMode == renderMode) return;
+
+    this.renderMode = renderMode;
+    switch (renderMode) {
+      case RenderMode.UNLIT:
+        this._regenerate(this._primitiveTriangleListVertices);
+        break;
+
+      case RenderMode.WIREFRAME:
+        this._regenerate(this._primitiveLineListVertices);
+        break;
+    }
   }
 }
