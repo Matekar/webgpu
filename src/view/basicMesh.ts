@@ -4,8 +4,8 @@ import { RenderMode } from "../interfaces/enums";
 import { VERTEX_LENGTH, toLineList } from "./assets/vertices";
 
 export class BasicMesh implements Mesh {
-  _primitiveTriangleListVertices: Float32Array;
-  _primitiveLineListVertices: Float32Array;
+  _primitiveTriangleListVertices!: Float32Array;
+  _primitiveLineListVertices!: Float32Array;
 
   buffer!: GPUBuffer;
   bufferUsage: GPUBufferUsageFlags;
@@ -16,26 +16,10 @@ export class BasicMesh implements Mesh {
 
   renderMode: RenderMode;
 
-  constructor(
-    vertices: Float32Array,
-    renderMode: RenderMode = RenderMode.UNLIT
-  ) {
-    this._primitiveTriangleListVertices = vertices;
-    this._primitiveLineListVertices = toLineList(vertices);
-    this.bufferUsage = GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
-
+  constructor(renderMode: RenderMode = RenderMode.UNLIT) {
     this.renderMode = renderMode;
 
-    switch (renderMode) {
-      case RenderMode.UNLIT:
-        this._regenerate(this._primitiveTriangleListVertices);
-        break;
-
-      case RenderMode.WIREFRAME:
-        this._regenerate(this._primitiveLineListVertices);
-        break;
-    }
-
+    this.bufferUsage = GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
     this.bufferLayout = {
       arrayStride: 24,
       attributes: [
@@ -51,6 +35,23 @@ export class BasicMesh implements Mesh {
         },
       ],
     };
+  }
+
+  initFromVertexArray(vertices: Float32Array): BasicMesh {
+    this._primitiveTriangleListVertices = vertices;
+    this._primitiveLineListVertices = toLineList(vertices);
+
+    switch (this.renderMode) {
+      case RenderMode.UNLIT:
+        this._regenerate(this._primitiveTriangleListVertices);
+        break;
+
+      case RenderMode.WIREFRAME:
+        this._regenerate(this._primitiveLineListVertices);
+        break;
+    }
+
+    return this;
   }
 
   _regenerate = (vertices: Float32Array): void => {

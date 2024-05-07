@@ -6,19 +6,7 @@ import { Face } from "../interfaces/Face";
 import { cUserAgent } from "../app/userAgent";
 import { BasicMesh } from "./basicMesh";
 
-export class ObjMesh implements Mesh {
-  _primitiveTriangleListVertices!: Float32Array;
-  _primitiveLineListVertices!: Float32Array;
-
-  buffer!: GPUBuffer;
-  bufferUsage: GPUBufferUsageFlags;
-  bufferLayout!: GPUVertexBufferLayout;
-
-  vertexSize!: number;
-  vertexCount!: number;
-
-  renderMode: RenderMode;
-
+export class ObjMesh extends BasicMesh {
   v: vec4[]; // vertices
   vt: vec2[]; // texture coordinates
   vn: vec3[]; // vertex normals
@@ -26,35 +14,15 @@ export class ObjMesh implements Mesh {
   f: Face[]; // faces
 
   constructor(renderMode: RenderMode = RenderMode.UNLIT) {
+    super(renderMode);
     this.v = [];
     this.vt = [];
     this.vn = [];
     this.f = [];
-
-    this.bufferUsage = GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
-
-    this.renderMode = renderMode;
-
-    this.bufferLayout = {
-      arrayStride: 24,
-      attributes: [
-        {
-          shaderLocation: 0,
-          format: "float32x4",
-          offset: 0,
-        },
-        {
-          shaderLocation: 1,
-          format: "float32x2",
-          offset: 16,
-        },
-      ],
-    };
   }
 
-  async initFromVertexArray(vertices: Float32Array): Promise<void> {
-    this._primitiveTriangleListVertices = vertices;
-    this._primitiveLineListVertices = toLineList(vertices);
+  override initFromVertexArray(vertices: Float32Array): ObjMesh {
+    return super.initFromVertexArray(vertices) as ObjMesh;
   }
 
   async initFromFile(url: string): Promise<ObjMesh> {
@@ -107,7 +75,15 @@ export class ObjMesh implements Mesh {
     });
 
     this._colapse();
-    this._regenerate(this._primitiveTriangleListVertices);
+    switch (this.renderMode) {
+      case RenderMode.UNLIT:
+        this._regenerate(this._primitiveTriangleListVertices);
+        break;
+
+      case RenderMode.WIREFRAME:
+        this._regenerate(this._primitiveLineListVertices);
+        break;
+    }
     return this;
   }
 
@@ -131,36 +107,4 @@ export class ObjMesh implements Mesh {
   _expand = (): void => {
     throw new Error("Method not implemented.");
   };
-
-  _regenerate = (vertices: Float32Array): void => {
-    if (this.buffer) this.buffer.destroy();
-
-    const descriptor: GPUBufferDescriptor = {
-      size: vertices.byteLength,
-      usage: this.bufferUsage,
-      mappedAtCreation: true,
-    };
-
-    this.buffer = cUserAgent.device.createBuffer(descriptor);
-    new Float32Array(this.buffer.getMappedRange()).set(vertices);
-    this.buffer.unmap();
-
-    this.vertexSize = VERTEX_LENGTH;
-    this.vertexCount = vertices.length / VERTEX_LENGTH;
-  };
-
-  switchRenderMode(renderMode: RenderMode): void {
-    if (this.renderMode == renderMode) return;
-
-    this.renderMode = renderMode;
-    switch (renderMode) {
-      case RenderMode.UNLIT:
-        this._regenerate(this._primitiveTriangleListVertices);
-        break;
-
-      case RenderMode.WIREFRAME:
-        this._regenerate(this._primitiveLineListVertices);
-        break;
-    }
-  }
 }
