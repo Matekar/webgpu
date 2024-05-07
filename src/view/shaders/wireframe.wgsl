@@ -23,9 +23,9 @@ fn vs_main(
 ) -> Wire {
   var output: Wire;
   output.Position = transformUBO.projection 
-                * transformUBO.view 
-                * objects.model[ID] 
-                * vertexPosition;
+                  * transformUBO.view 
+                  * objects.model[ID] 
+                  * vertexPosition;
   output.FragmentPosition = fragmentPosition;
 
   return output;
