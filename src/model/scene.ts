@@ -1,6 +1,8 @@
 import { objectTypes } from "../interfaces/enums";
 import { RenderData } from "../interfaces/RenderData";
 
+import { Model } from "../interfaces/Model";
+
 import { ZRotatingModel } from "./zRotatingModel";
 import { BasicModel } from "./basicModel";
 import { Camera } from "./camera";
@@ -8,16 +10,24 @@ import { Camera } from "./camera";
 import { vec3, mat4 } from "gl-matrix";
 
 export class Scene {
-  triangles: BasicModel[];
-  quads: BasicModel[];
+  models: Model[];
+  triangles: Model[];
+  quads: Model[];
+  cubes: Model[];
+  dingus: Model[];
+
   player: Camera;
   objectData: Float32Array;
   triangleCount: number;
   quadCount: number;
 
   constructor() {
+    this.models = [];
+
     this.triangles = [];
     this.quads = [];
+    this.cubes = [];
+    this.dingus = [];
 
     this.objectData = new Float32Array(16 * 1024);
 
@@ -27,7 +37,9 @@ export class Scene {
     this._makeTriangles();
     this._makeQuads();
 
-    this.player = new Camera([-2, 0, 0.5], 0, 0);
+    this._makeModels();
+
+    this.player = new Camera([-6000, 500, 100], 0, 0);
   }
 
   _makeTriangles = () => {
@@ -59,10 +71,17 @@ export class Scene {
       }
     }
 
+    this.cubes.push(new BasicModel([0, 0, 0.5]));
     const blankMatrix = mat4.create();
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
+
+    this.dingus.push(new ZRotatingModel([0, 0, 0.5], 0));
+    for (let j: number = 0; j < 16; j++)
+      this.objectData[16 * i + j] = <number>blankMatrix.at(j);
   };
+
+  _makeModels = () => {};
 
   update() {
     let i: number = 0;
@@ -79,6 +98,24 @@ export class Scene {
     this.quads.forEach((quad) => {
       quad.update();
       const model = quad.getModel();
+      for (let j: number = 0; j < 16; j++) {
+        this.objectData[16 * i + j] = <number>model.at(j);
+      }
+      i++;
+    });
+
+    this.cubes.forEach((cube) => {
+      cube.update();
+      const model = cube.getModel();
+      for (let j: number = 0; j < 16; j++) {
+        this.objectData[16 * i + j] = <number>model.at(j);
+      }
+      i++;
+    });
+
+    this.dingus.forEach((d) => {
+      d.update();
+      const model = d.getModel();
       for (let j: number = 0; j < 16; j++) {
         this.objectData[16 * i + j] = <number>model.at(j);
       }
@@ -136,6 +173,7 @@ export class Scene {
       objectCounts: {
         [objectTypes.TRIANGLE]: this.triangleCount,
         [objectTypes.QUAD]: this.quadCount,
+        [objectTypes.CUBE]: 1,
       },
     };
   }

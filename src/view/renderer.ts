@@ -12,6 +12,7 @@ import { initializeUnlitPipeline } from "./pipes/unlitPipeline";
 import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 import { cUserAgent } from "../app/userAgent";
 import { cMeshLibrary } from "../utility/MeshLibrary";
+import { ObjMesh } from "./objMesh";
 
 export class Renderer {
   // Pipeline objects
@@ -40,6 +41,7 @@ export class Renderer {
   triangleMaterial!: Material;
   quadMaterial!: Material;
   blankMaterial!: Material;
+  dingusMaterial!: Material; // FIXME: [temporary]
   objectBuffer!: GPUBuffer;
 
   constructor() {
@@ -152,12 +154,19 @@ export class Renderer {
     cMeshLibrary.set("triangleMesh", new BasicMesh(triangleVertices));
     cMeshLibrary.set("quadMesh", new BasicMesh(quadVertices));
     cMeshLibrary.set("cubeMesh", new BasicMesh(cubeVertices));
+
+    // FIXME: [temporary]
+    cMeshLibrary.set(
+      "dingus",
+      await new ObjMesh().initFromFile("./data/maxwell.obj")
+    );
   };
 
   _createMaterials = async () => {
     this.triangleMaterial = new Material();
     this.quadMaterial = new Material();
     this.blankMaterial = new Material();
+    this.dingusMaterial = new Material(); //FIXME: [temporary]
 
     this.uniformBuffer = cUserAgent.device.createBuffer({
       size: 64 * 2,
@@ -182,6 +191,12 @@ export class Renderer {
     );
     await this.blankMaterial.initBlank(
       cUserAgent.device,
+      this.materialGroupLayout
+    );
+    // FIXME: [temporary]
+    await this.dingusMaterial.init(
+      cUserAgent.device,
+      "./img/dingus.jpg",
       this.materialGroupLayout
     );
   };
@@ -230,7 +245,7 @@ export class Renderer {
       Math.PI / 4,
       cUserAgent.canvas.width / cUserAgent.canvas.height,
       0.1,
-      100
+      10000
     );
 
     const view = renderables.viewTransform;
@@ -309,6 +324,17 @@ export class Renderer {
     renderpass.setBindGroup(1, this.blankMaterial.bindGroup);
     renderpass.draw(
       cMeshLibrary.get("cubeMesh")!.vertexCount,
+      1,
+      0,
+      objectsDrawn
+    );
+    objectsDrawn += 1;
+
+    // FIXME: [temporary]
+    renderpass.setVertexBuffer(0, cMeshLibrary.get("dingus")!.buffer);
+    renderpass.setBindGroup(1, this.dingusMaterial.bindGroup);
+    renderpass.draw(
+      cMeshLibrary.get("dingus")!.vertexCount,
       1,
       0,
       objectsDrawn

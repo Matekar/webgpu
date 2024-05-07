@@ -1,141 +1,166 @@
-import { vec2, vec3 } from "gl-matrix";
+import { vec2, vec3, vec4 } from "gl-matrix";
+import { Mesh } from "../interfaces/Mesh";
+import { RenderMode } from "../interfaces/enums";
+import { VERTEX_LENGTH, toLineList } from "./assets/vertices";
+import { Face } from "../interfaces/Face";
+import { cUserAgent } from "../app/userAgent";
+import { BasicMesh } from "./basicMesh";
 
-export class OBJMesh {
+export class ObjMesh implements Mesh {
+  _primitiveTriangleListVertices!: Float32Array;
+  _primitiveLineListVertices!: Float32Array;
+
   buffer!: GPUBuffer;
+  bufferUsage: GPUBufferUsageFlags;
   bufferLayout!: GPUVertexBufferLayout;
 
-  v: vec3[];
-  vt: vec2[];
-  vn: vec3[];
-
-  vertices!: Float32Array;
+  vertexSize!: number;
   vertexCount!: number;
 
-  constructor(device: GPUDevice) {
+  renderMode: RenderMode;
+
+  v: vec4[]; // vertices
+  vt: vec2[]; // texture coordinates
+  vn: vec3[]; // vertex normals
+
+  f: Face[]; // faces
+
+  constructor(renderMode: RenderMode = RenderMode.UNLIT) {
     this.v = [];
     this.vt = [];
     this.vn = [];
-  }
+    this.f = [];
 
-  init = async (device: GPUDevice, url: string) => {
-    await this._readFile(url);
-    this.vertexCount = this.vertices.length / 5;
+    this.bufferUsage = GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
 
-    const usage: GPUBufferUsageFlags =
-      GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST;
-
-    const descriptor: GPUBufferDescriptor = {
-      size: this.vertices.byteLength,
-      usage,
-      mappedAtCreation: true,
-    };
-
-    this.buffer = device.createBuffer(descriptor);
-
-    new Float32Array(this.buffer.getMappedRange()).set(this.vertices);
-    this.buffer.unmap();
+    this.renderMode = renderMode;
 
     this.bufferLayout = {
-      arrayStride: 20,
+      arrayStride: 24,
       attributes: [
         {
           shaderLocation: 0,
-          format: "float32x3",
+          format: "float32x4",
           offset: 0,
         },
         {
           shaderLocation: 1,
           format: "float32x2",
-          offset: 12,
+          offset: 16,
         },
       ],
     };
-  };
+  }
 
-  _readFile = async (url: string) => {
-    const result: number[] = [];
+  async initFromVertexArray(vertices: Float32Array): Promise<void> {
+    this._primitiveTriangleListVertices = vertices;
+    this._primitiveLineListVertices = toLineList(vertices);
+  }
 
+  async initFromFile(url: string): Promise<ObjMesh> {
     const res: Response = await fetch(url);
     const blob: Blob = await res.blob();
     const fileContents = await blob.text();
     const lines = fileContents.split("\n");
 
     lines.forEach((line) => {
-      const trimmed = line.trim();
+      const parts = line.trim().split(/\s+/);
+      const tag = parts.shift();
 
-      switch (trimmed.slice(0, 2)) {
-        case "v ":
-          this._readVertexLine(trimmed);
+      switch (tag) {
+        case "v":
+          const [x, z, y, w] = parts.map(parseFloat);
+          this.v.push(vec4.fromValues(x, y, z, w ? w : 1.0));
           break;
 
         case "vt":
-          this._readTexCoordLine(trimmed);
+          const [u, v] = parts.map(parseFloat);
+          this.vt.push(vec2.fromValues(u, v));
           break;
 
         case "vn":
-          this._readNormalLine(trimmed);
+          const [p, q, r] = parts.map(parseFloat);
+          this.vn.push(vec3.fromValues(p, q, r));
           break;
 
-        case "f ":
-          this._readFaceLine(trimmed, result);
+        case "f":
+          const readFaces: Face[] = [];
+          parts.forEach((part) => {
+            const result: Face = Face.create();
+            const indices = part
+              .split("/")
+              .map((index) => parseInt(index, 10) - 1);
+            result.v = this.v[indices[0]];
+            if (indices[1] !== undefined) result.vt = this.vt[indices[1]];
+            if (indices[2] !== undefined) result.vn = this.vn[indices[2]];
+            readFaces.push(result);
+          });
+
+          for (let i = 1; i <= readFaces.length - 2; i++) {
+            this.f.push(readFaces[0], readFaces[i], readFaces[i + 1]);
+          }
+          break;
 
         default:
           break;
       }
     });
 
-    this.vertices = new Float32Array(result);
-  };
+    this._colapse();
+    this._regenerate(this._primitiveTriangleListVertices);
+    return this;
+  }
 
-  _readVertexLine = (line: string) => {
-    const splitted = line.split(" ");
-    const vertex: vec3 = [
-      Number(splitted[1]).valueOf(),
-      Number(splitted[2]).valueOf(),
-      Number(splitted[3]).valueOf(),
-    ];
+  // v: vec4, vt: vec2 => Float32Array
+  _colapse = (): BasicMesh => {
+    const resultVertices: number[] = [];
 
-    this.v.push(vertex);
-  };
-
-  _readTexCoordLine = (line: string) => {
-    const splitted = line.split(" ");
-    const vertex: vec2 = [
-      Number(splitted[1]).valueOf(),
-      Number(splitted[2]).valueOf(),
-    ];
-
-    this.vt.push(vertex);
-  };
-
-  _readNormalLine = (line: string) => {
-    const splitted = line.split(" ");
-    const vertex: vec3 = [
-      Number(splitted[1]).valueOf(),
-      Number(splitted[2]).valueOf(),
-      Number(splitted[3]).valueOf(),
-    ];
-
-    this.vn.push(vertex);
-  };
-
-  _readFaceLine = (line: string, result: number[]) => {
-    const vertexDescriptions = line.split(" ");
-    const triangleCount = vertexDescriptions.length - 3;
-
-    for (let i = 0; i < triangleCount; i++) {
-      this._readCorner(vertexDescriptions[1], result);
-      this._readCorner(vertexDescriptions[2 + i], result);
-      this._readCorner(vertexDescriptions[3 + i], result);
+    for (const face of this.f) {
+      resultVertices.push(...face.v, ...face.vt);
     }
+
+    this._primitiveTriangleListVertices = new Float32Array(resultVertices);
+    this._primitiveLineListVertices = toLineList(
+      new Float32Array(resultVertices)
+    );
+
+    return this;
   };
 
-  _readCorner = (vertexDescription: string, result: number[]) => {
-    const splitted = vertexDescription.split("/");
-
-    const v = this.v[Number(splitted[0]).valueOf() - 1];
-    const vt = this.vt[Number(splitted[0]).valueOf() - 1];
-
-    result.push(...v, ...vt);
+  // Float32Array => v: vec4, vt: vec2
+  _expand = (): void => {
+    throw new Error("Method not implemented.");
   };
+
+  _regenerate = (vertices: Float32Array): void => {
+    if (this.buffer) this.buffer.destroy();
+
+    const descriptor: GPUBufferDescriptor = {
+      size: vertices.byteLength,
+      usage: this.bufferUsage,
+      mappedAtCreation: true,
+    };
+
+    this.buffer = cUserAgent.device.createBuffer(descriptor);
+    new Float32Array(this.buffer.getMappedRange()).set(vertices);
+    this.buffer.unmap();
+
+    this.vertexSize = VERTEX_LENGTH;
+    this.vertexCount = vertices.length / VERTEX_LENGTH;
+  };
+
+  switchRenderMode(renderMode: RenderMode): void {
+    if (this.renderMode == renderMode) return;
+
+    this.renderMode = renderMode;
+    switch (renderMode) {
+      case RenderMode.UNLIT:
+        this._regenerate(this._primitiveTriangleListVertices);
+        break;
+
+      case RenderMode.WIREFRAME:
+        this._regenerate(this._primitiveLineListVertices);
+        break;
+    }
+  }
 }
