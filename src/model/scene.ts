@@ -39,7 +39,7 @@ export class Scene {
 
     this._makeModels();
 
-    this.player = new Camera([-6000, 500, 100], 0, 0);
+    this.player = new Camera([-2, 0, 0.5], 0, 0);
   }
 
   _makeTriangles = () => {
@@ -76,7 +76,8 @@ export class Scene {
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
 
-    this.dingus.push(new ZRotatingModel([0, 0, 0.5], 0));
+    this.dingus.push(new ZRotatingModel([-5, 0, 0.5], 0));
+    this.dingus[0].scaler = vec3.fromValues(0.001, 0.001, 0.001);
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
   };
