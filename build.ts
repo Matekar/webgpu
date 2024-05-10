@@ -33,9 +33,11 @@ const build = async () => {
 
 await build();
 
-const watcher = watch(import.meta.dir + "/src", { recursive: true });
-for await (const _ of watcher) {
-  await build();
+if (process.argv[2] == "--loop") {
+  const watcher = watch(import.meta.dir + "/src", { recursive: true });
+  for await (const _ of watcher) {
+    await build();
+  }
 }
 
 // const globMinWGSL = new Glob("src/shaders/*.{minwgsl}");
