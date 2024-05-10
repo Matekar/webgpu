@@ -18,7 +18,7 @@ process.on("SIGINT", () => {
 const build = async () => {
   await Bun.build({
     entrypoints: ["./src/index.ts"],
-    outdir: "./build",
+    outdir: "./public/build",
     target: "browser",
     format: "esm",
     splitting: false,
