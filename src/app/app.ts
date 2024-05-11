@@ -1,6 +1,7 @@
 import { Renderer } from "../view/renderer";
 import { Scene } from "../model/scene";
 import { RenderMode } from "../interfaces/enums";
+import { rad2deg, vecsToRotation } from "../utility/mathUtilities";
 
 export class App {
   canvas: HTMLCanvasElement;
@@ -135,6 +136,12 @@ export class App {
     );
     this.keyLabel.innerText += "]";
 
+    const [fAngle, rAngle, uAngle] = vecsToRotation(
+      this.scene.player.forward,
+      this.scene.player.right,
+      this.scene.player.up
+    );
+
     this.cameraPositionLabel.innerHTML =
       "Camera position: " +
       Math.floor((this.scene.player.position[0] + Number.EPSILON) * 100) / 100 +
@@ -144,12 +151,15 @@ export class App {
       Math.floor((this.scene.player.position[2] + Number.EPSILON) * 100) / 100;
 
     this.cameraForwardsLabel.innerHTML =
-      " Forwards: " +
-      Math.floor((this.scene.player.forwards[0] + Number.EPSILON) * 100) / 100 +
+      " Forward: " +
+      Math.floor((this.scene.player.forward[0] + Number.EPSILON) * 100) / 100 +
       ", " +
-      Math.floor((this.scene.player.forwards[1] + Number.EPSILON) * 100) / 100 +
+      Math.floor((this.scene.player.forward[1] + Number.EPSILON) * 100) / 100 +
       ", " +
-      Math.floor((this.scene.player.forwards[2] + Number.EPSILON) * 100) / 100;
+      Math.floor((this.scene.player.forward[2] + Number.EPSILON) * 100) / 100 +
+      " PSI:(" +
+      Math.floor((rad2deg(fAngle) + Number.EPSILON) * 100) / 100 +
+      ")";
 
     this.cameraRightLabel.innerHTML =
       " Right: " +
@@ -157,7 +167,10 @@ export class App {
       ", " +
       Math.floor((this.scene.player.right[1] + Number.EPSILON) * 100) / 100 +
       ", " +
-      Math.floor((this.scene.player.right[2] + Number.EPSILON) * 100) / 100;
+      Math.floor((this.scene.player.right[2] + Number.EPSILON) * 100) / 100 +
+      " THETA:(" +
+      Math.floor((rad2deg(rAngle) + Number.EPSILON) * 100) / 100 +
+      ")";
 
     this.cameraUpLabel.innerHTML =
       " Up: " +
@@ -165,6 +178,9 @@ export class App {
       ", " +
       Math.floor((this.scene.player.up[1] + Number.EPSILON) * 100) / 100 +
       ", " +
-      Math.floor((this.scene.player.up[2] + Number.EPSILON) * 100) / 100;
+      Math.floor((this.scene.player.up[2] + Number.EPSILON) * 100) / 100 +
+      " PHI:(" +
+      Math.floor((rad2deg(uAngle) + Number.EPSILON) * 100) / 100 +
+      ")";
   };
 }

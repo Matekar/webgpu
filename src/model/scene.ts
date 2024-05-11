@@ -140,7 +140,7 @@ export class Scene {
     vec3.scaleAndAdd(
       this.player.position,
       this.player.position,
-      this.player.forwards,
+      this.player.forward,
       forwardsAmmount
     );
 
