@@ -167,7 +167,7 @@ export class Renderer {
     // FIXME: [temporary]
     cMeshLibrary.set(
       "dingus",
-      await new ObjMesh().initFromFile("./data/maxwell.obj")
+      await new ObjMesh().initFromFile("./data/cube.obj")
     );
   };
 

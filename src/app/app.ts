@@ -1,12 +1,20 @@
 import { Renderer } from "../view/renderer";
 import { Scene } from "../model/scene";
 import { RenderMode } from "../interfaces/enums";
-import { rad2deg, vecsToRotation } from "../utility/mathUtilities";
+import {
+  rad2deg,
+  rayIntersectionTest,
+  vecsToRotation,
+} from "../utility/mathUtilities";
+import { ObjMesh } from "../view/objMesh";
+import { vec3 } from "gl-matrix";
 
 export class App {
   canvas: HTMLCanvasElement;
   renderer: Renderer;
   scene: Scene;
+
+  testObjMesh!: ObjMesh;
 
   // FIXME: reorganize querying HTML Elements do display debug info
 
@@ -62,6 +70,7 @@ export class App {
 
   async init() {
     await this.renderer.init();
+    this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj");
   }
 
   run = () => {
@@ -96,6 +105,13 @@ export class App {
 
     if (running) {
       requestAnimationFrame(this.run);
+      const intersectionResult = rayIntersectionTest(
+        this.scene.player.position,
+        this.scene.player.forward,
+        this.testObjMesh,
+        vec3.fromValues(-5, 0, 0.5)
+      );
+      if (intersectionResult) console.log(intersectionResult.distance);
     }
   };
 

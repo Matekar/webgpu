@@ -76,8 +76,8 @@ export class Scene {
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
 
-    this.dingus.push(new ZRotatingModel([-5, 0, 0.5], 0));
-    this.dingus[0].scaler = vec3.fromValues(0.001, 0.001, 0.001);
+    this.dingus.push(new BasicModel([-5, 0, 0.5]));
+    //this.dingus[0].scaler = vec3.fromValues(0.001, 0.001, 0.001);
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
   };
