@@ -8,6 +8,7 @@ import { BasicModel } from "./basicModel";
 import { Camera } from "./camera";
 
 import { vec3, mat4 } from "gl-matrix";
+import { cMeshLibrary } from "../utility/MeshLibrary";
 
 export class Scene {
   models: Model[];
@@ -45,7 +46,9 @@ export class Scene {
   _makeTriangles = () => {
     let i: number = 0;
     for (let y: number = -5; y <= 5; y++) {
-      this.triangles.push(new ZRotatingModel([2, y, 0.5], 0));
+      this.triangles.push(
+        new ZRotatingModel([2, y, 0.5], cMeshLibrary.get("triangleMesh")!, 0)
+      );
 
       const blankMatrix = mat4.create();
       for (let j: number = 0; j < 16; j++)
@@ -60,7 +63,9 @@ export class Scene {
     let i: number = this.triangleCount;
     for (let x: number = -10; x <= 10; x++) {
       for (let y: number = -5; y <= 5; y++) {
-        this.quads.push(new BasicModel([x, y, 0]));
+        this.quads.push(
+          new BasicModel([x, y, 0], cMeshLibrary.get("quadMesh")!)
+        );
 
         const blankMatrix = mat4.create();
         for (let j: number = 0; j < 16; j++)
@@ -71,12 +76,12 @@ export class Scene {
       }
     }
 
-    this.cubes.push(new BasicModel([0, 0, 0.5]));
+    this.cubes.push(new BasicModel([0, 0, 0.5], cMeshLibrary.get("cubeMesh")!));
     const blankMatrix = mat4.create();
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
 
-    this.dingus.push(new BasicModel([-5, 0, 0.5]));
+    this.dingus.push(new BasicModel([-5, 0, 0.5], cMeshLibrary.get("dingus")!));
     //this.dingus[0].scaler = vec3.fromValues(0.001, 0.001, 0.001);
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);

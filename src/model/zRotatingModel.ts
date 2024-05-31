@@ -1,10 +1,11 @@
 import { vec3, mat4 } from "gl-matrix";
 import { deg2rad } from "../utility/mathUtilities";
 import { BasicModel } from "./basicModel";
+import { Mesh } from "../interfaces/Mesh";
 
 export class ZRotatingModel extends BasicModel {
-  constructor(position: vec3, theta: number) {
-    super(position);
+  constructor(position: vec3, mesh: Mesh, theta: number) {
+    super(position, mesh);
     this.eulers[2] = theta;
   }
 
