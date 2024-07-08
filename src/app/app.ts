@@ -8,15 +8,18 @@ import {
 } from "../utility/mathUtilities";
 import { ObjMesh } from "../view/objMesh";
 import { vec3 } from "gl-matrix";
+import { BasicModel } from "../model/basicModel";
 
 export class App {
   canvas: HTMLCanvasElement;
   renderer: Renderer;
   scene: Scene;
 
+  // FIXME: temp
   testObjMesh!: ObjMesh;
 
   // FIXME: reorganize querying HTML Elements do display debug info
+  // FIXME: move HTMLElement to separate object/function/singleton
 
   keyLabel: HTMLElement;
   mouseXLabel: HTMLElement;
@@ -70,7 +73,7 @@ export class App {
 
   async init() {
     await this.renderer.init();
-    this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj");
+    this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj"); //FIXME: temp
   }
 
   run = () => {
@@ -105,11 +108,14 @@ export class App {
 
     if (running) {
       requestAnimationFrame(this.run);
+      // FIXME: temp
       const intersectionResult = rayIntersectionTest(
         this.scene.player.position,
         this.scene.player.forward,
         this.testObjMesh,
-        vec3.fromValues(-5, 0, 0.5)
+        new BasicModel(vec3.fromValues(-5, 0, 0.5), this.testObjMesh)
+          .update()
+          .getModel()
       );
       if (intersectionResult) console.log(intersectionResult.distance);
     }

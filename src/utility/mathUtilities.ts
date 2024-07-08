@@ -1,4 +1,4 @@
-import { vec3, vec4 } from "gl-matrix";
+import { ReadonlyMat4, vec3, vec4 } from "gl-matrix";
 import { ObjMesh } from "../view/objMesh";
 
 export function deg2rad(theta: number): number {
@@ -33,27 +33,21 @@ export function rayIntersectionTest(
   rayOrigin: vec3,
   rayDirection: vec3,
   mesh: ObjMesh,
-  meshPosition: vec3 = vec3.create()
+  modelMatrix: ReadonlyMat4
 ): { point: vec3; distance: number } | null {
   let closestIntersection = Infinity;
   let closestIntersectionPoint = null;
 
   for (let i = 0; i < mesh.f.length; i += 3) {
     // calculated moved vertices
-    const vA = vec3.add(
-      vec3.create(),
-      cvec3.fromVec4(mesh.f[i].v),
-      meshPosition
+    const vA = cvec3.fromVec4(
+      vec4.transformMat4(vec4.create(), mesh.f[i].v, modelMatrix)
     );
-    const vB = vec3.add(
-      vec3.create(),
-      cvec3.fromVec4(mesh.f[i + 1].v),
-      meshPosition
+    const vB = cvec3.fromVec4(
+      vec4.transformMat4(vec4.create(), mesh.f[i + 1].v, modelMatrix)
     );
-    const vC = vec3.add(
-      vec3.create(),
-      cvec3.fromVec4(mesh.f[i + 2].v),
-      meshPosition
+    const vC = cvec3.fromVec4(
+      vec4.transformMat4(vec4.create(), mesh.f[i + 2].v, modelMatrix)
     );
 
     const e1 = vec3.subtract(vec3.create(), vB, vA);

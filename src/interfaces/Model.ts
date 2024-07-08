@@ -1,4 +1,4 @@
-import { mat4, vec3 } from "gl-matrix";
+import { ReadonlyMat4, mat4, vec3 } from "gl-matrix";
 import { Mesh } from "./Mesh";
 
 export interface Model {
@@ -9,9 +9,9 @@ export interface Model {
   model: mat4;
   mesh: Mesh;
 
-  update: () => void;
+  update: () => Model;
 
-  getModel: () => mat4;
+  getModel: () => ReadonlyMat4;
 
   getMesh: () => Mesh;
 }
