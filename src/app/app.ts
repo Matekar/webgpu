@@ -113,9 +113,7 @@ export class App {
         this.scene.player.position,
         this.scene.player.forward,
         this.testObjMesh,
-        new BasicModel(vec3.fromValues(-5, 0, 0.5), this.testObjMesh)
-          .update()
-          .getModel()
+        new BasicModel(vec3.fromValues(-5, 0, 0.5)).update().getModel()
       );
       if (intersectionResult) console.log(intersectionResult.distance);
     }

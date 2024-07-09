@@ -8,14 +8,11 @@ export class BasicModel implements Model {
   scaler: vec3;
 
   model!: mat4;
-  mesh: Mesh;
 
-  constructor(position: vec3, mesh: Mesh) {
+  constructor(position: vec3) {
     this.position = position;
     this.eulers = vec3.create();
     this.scaler = vec3.fromValues(1, 1, 1);
-
-    this.mesh = mesh;
   }
 
   update(): BasicModel {
@@ -28,9 +25,5 @@ export class BasicModel implements Model {
 
   getModel(): ReadonlyMat4 {
     return this.model;
-  }
-
-  getMesh() {
-    return this.mesh;
   }
 }

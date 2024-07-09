@@ -46,9 +46,7 @@ export class Scene {
   _makeTriangles = () => {
     let i: number = 0;
     for (let y: number = -5; y <= 5; y++) {
-      this.triangles.push(
-        new ZRotatingModel([2, y, 0.5], cMeshLibrary.get("triangleMesh")!, 0)
-      );
+      this.triangles.push(new ZRotatingModel([2, y, 0.5], 0));
 
       const blankMatrix = mat4.create();
       for (let j: number = 0; j < 16; j++)
@@ -63,9 +61,7 @@ export class Scene {
     let i: number = this.triangleCount;
     for (let x: number = -10; x <= 10; x++) {
       for (let y: number = -5; y <= 5; y++) {
-        this.quads.push(
-          new BasicModel([x, y, 0], cMeshLibrary.get("quadMesh")!)
-        );
+        this.quads.push(new BasicModel([x, y, 0]));
 
         const blankMatrix = mat4.create();
         for (let j: number = 0; j < 16; j++)
@@ -76,12 +72,12 @@ export class Scene {
       }
     }
 
-    this.cubes.push(new BasicModel([0, 0, 0.5], cMeshLibrary.get("cubeMesh")!));
+    this.cubes.push(new BasicModel([0, 0, 0.5]));
     const blankMatrix = mat4.create();
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);
 
-    this.dingus.push(new BasicModel([-5, 0, 0.5], cMeshLibrary.get("dingus")!));
+    this.dingus.push(new BasicModel([-5, 0, 0.5]));
     //this.dingus[0].scaler = vec3.fromValues(0.001, 0.001, 0.001);
     for (let j: number = 0; j < 16; j++)
       this.objectData[16 * i + j] = <number>blankMatrix.at(j);

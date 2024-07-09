@@ -7,11 +7,8 @@ export interface Model {
   scaler?: vec3;
 
   model: mat4;
-  mesh: Mesh;
 
   update: () => Model;
 
   getModel: () => ReadonlyMat4;
-
-  getMesh: () => Mesh;
 }

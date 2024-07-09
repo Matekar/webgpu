@@ -4,8 +4,8 @@ import { BasicModel } from "./basicModel";
 import { Mesh } from "../interfaces/Mesh";
 
 export class ZRotatingModel extends BasicModel {
-  constructor(position: vec3, mesh: Mesh, theta: number) {
-    super(position, mesh);
+  constructor(position: vec3, theta: number) {
+    super(position);
     this.eulers[2] = theta;
   }
 
@@ -15,5 +15,7 @@ export class ZRotatingModel extends BasicModel {
 
     super.update();
     mat4.rotateZ(this.model, this.model, deg2rad(this.eulers[2]));
+
+    return this;
   };
 }
