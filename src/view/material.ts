@@ -1,3 +1,12 @@
+import { vec3 } from "gl-matrix";
+
+const grassColorValues = [
+  vec3.fromValues(74, 111, 40),
+  vec3.fromValues(91, 135, 49),
+  vec3.fromValues(62, 92, 32),
+  vec3.fromValues(82, 122, 45),
+  vec3.fromValues(91, 139, 50),
+];
 export class Material {
   texture!: GPUTexture;
   textureView!: GPUTextureView;
@@ -97,7 +106,10 @@ export class Material {
   }
 
   // FIXME: [temporary]
-  _createBlank = async (device: GPUDevice) => {
+  _createBlank = async (
+    device: GPUDevice,
+    colorValues: vec3[] = grassColorValues
+  ) => {
     const textureDescriptor: GPUTextureDescriptor = {
       size: { width: 16, height: 16, depthOrArrayLayers: 1 },
       mipLevelCount: 1,
@@ -126,20 +138,12 @@ export class Material {
     //   dataArray[i + off] = 0;
     // }
 
-    const grass = [
-      [74, 111, 40],
-      [91, 135, 49],
-      [62, 92, 32],
-      [82, 122, 45],
-      [91, 139, 50],
-    ];
-
     for (let i = 0; i < dataSize; i += 4) {
-      const rand = Math.floor(Math.random() * 5);
+      const rand = Math.floor(Math.random() * colorValues.length);
 
-      dataArray[i] = grass[rand][0];
-      dataArray[i + 1] = grass[rand][1];
-      dataArray[i + 2] = grass[rand][2];
+      dataArray[i] = colorValues[rand][0];
+      dataArray[i + 1] = colorValues[rand][1];
+      dataArray[i + 2] = colorValues[rand][2];
       dataArray[i + 3] = 255;
     }
 

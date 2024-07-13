@@ -11,7 +11,7 @@ import { RenderData } from "../interfaces/RenderData";
 import { initializeUnlitPipeline } from "./pipes/unlitPipeline";
 import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 import { cUserAgent } from "../app/userAgent";
-import { cMeshLibrary } from "../utility/MeshLibrary";
+import { cMaterialLibrary, cMeshLibrary } from "../utility/AssetLibraries";
 import { ObjMesh } from "./objMesh";
 
 export class Renderer {
@@ -45,7 +45,7 @@ export class Renderer {
   objectBuffer!: GPUBuffer;
 
   constructor() {
-    this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 0.0 };
+    this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 1.0 };
     this.renderMode = RenderMode.UNLIT;
   }
 
@@ -193,21 +193,25 @@ export class Renderer {
       "./img/chat.jpg",
       this.materialGroupLayout
     );
+    cMaterialLibrary.set("triangleMaterial", this.triangleMaterial);
     await this.quadMaterial.init(
       cUserAgent.device,
       "./img/floor.jpg",
       this.materialGroupLayout
     );
+    cMaterialLibrary.set("quadMaterial", this.quadMaterial);
     await this.blankMaterial.initBlank(
       cUserAgent.device,
       this.materialGroupLayout
     );
+    cMaterialLibrary.set("cubeMaterial", this.blankMaterial);
     // FIXME: [temporary]
     await this.dingusMaterial.init(
       cUserAgent.device,
       "./img/dingus.jpg",
       this.materialGroupLayout
     );
+    cMaterialLibrary.set("dingusMaterial", this.dingusMaterial);
   };
 
   _makeBindGroup = async () => {
@@ -308,7 +312,10 @@ export class Renderer {
     let objectsDrawn: number = 0;
     // Triangles
     renderpass.setVertexBuffer(0, cMeshLibrary.get("triangleMesh")!.buffer);
-    renderpass.setBindGroup(1, this.triangleMaterial.bindGroup);
+    renderpass.setBindGroup(
+      1,
+      cMaterialLibrary.get("triangleMaterial")!.bindGroup
+    );
     renderpass.draw(
       cMeshLibrary.get("triangleMesh")!.vertexCount,
       renderables.objectCounts[objectTypes.TRIANGLE],
@@ -319,7 +326,7 @@ export class Renderer {
 
     // Quads
     renderpass.setVertexBuffer(0, cMeshLibrary.get("quadMesh")!.buffer);
-    renderpass.setBindGroup(1, this.quadMaterial.bindGroup);
+    renderpass.setBindGroup(1, cMaterialLibrary.get("quadMaterial")!.bindGroup);
     renderpass.draw(
       cMeshLibrary.get("quadMesh")!.vertexCount,
       renderables.objectCounts[objectTypes.QUAD],
@@ -330,7 +337,7 @@ export class Renderer {
 
     // Cube
     renderpass.setVertexBuffer(0, cMeshLibrary.get("cubeMesh")!.buffer);
-    renderpass.setBindGroup(1, this.blankMaterial.bindGroup);
+    renderpass.setBindGroup(1, cMaterialLibrary.get("cubeMaterial")!.bindGroup);
     renderpass.draw(
       cMeshLibrary.get("cubeMesh")!.vertexCount,
       1,
@@ -341,7 +348,10 @@ export class Renderer {
 
     // FIXME: [temporary]
     renderpass.setVertexBuffer(0, cMeshLibrary.get("dingus")!.buffer);
-    renderpass.setBindGroup(1, this.dingusMaterial.bindGroup);
+    renderpass.setBindGroup(
+      1,
+      cMaterialLibrary.get("dingusMaterial")!.bindGroup
+    );
     renderpass.draw(
       cMeshLibrary.get("dingus")!.vertexCount,
       1,
