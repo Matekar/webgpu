@@ -10,9 +10,9 @@ export class Camera {
   right: vec3;
   up: vec3;
 
-  constructor(position: vec3, theta: number, phi: number) {
+  constructor(position: vec3, eulers: vec3) {
     this.position = position;
-    this.eulers = [0, phi, theta];
+    this.eulers = eulers;
     this.forward = vec3.create();
     this.right = vec3.create();
     this.up = vec3.create();
