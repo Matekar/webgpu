@@ -73,6 +73,8 @@ export class App {
 
   async init() {
     await this.renderer.init();
+    await this.scene.initFromJSON("./data/default.scene.json");
+    console.log(this.scene.getNewRenderables());
     this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj"); //FIXME: temp
   }
 
@@ -80,7 +82,7 @@ export class App {
     let running: boolean = true;
     let doAccelerate = this.moveMap.get("ShiftLeft");
 
-    this.scene.update();
+    this.scene.updateScene();
     this.scene.movePlayer(
       (this.moveMap.get("KeyW")
         ? 0.1 * (doAccelerate ? this.acceleration : 1)
@@ -102,7 +104,7 @@ export class App {
           : 0)
     );
 
-    this.renderer.render(this.scene.getRenderables());
+    this.renderer.render(this.scene.getNewRenderables());
 
     this._printDebugInfo();
 
