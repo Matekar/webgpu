@@ -1,14 +1,7 @@
 import { Renderer } from "../view/renderer";
 import { Scene } from "../model/scene";
 import { RenderMode } from "../interfaces/enums";
-import {
-  rad2deg,
-  rayIntersectionTest,
-  vecsToRotation,
-} from "../utility/mathUtilities";
-import { ObjMesh } from "../view/objMesh";
-import { vec3 } from "gl-matrix";
-import { BasicModel } from "../model/basicModel";
+import { rad2deg, vecsToRotation } from "../utility/mathUtilities";
 
 export class App {
   canvas: HTMLCanvasElement;
