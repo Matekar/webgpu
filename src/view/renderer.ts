@@ -1,13 +1,13 @@
 import { Material } from "./material";
-import { mat4, ReadonlyMat4 } from "gl-matrix";
-import { objectTypes, RenderMode } from "../interfaces/enums";
+import { mat4 } from "gl-matrix";
+import { RenderMode } from "../interfaces/enums";
 import { BasicMesh } from "./basicMesh";
 import {
   cubeVertices,
   quadVertices,
   triangleVertices,
 } from "./assets/vertices";
-import { NewRenderData, RenderData } from "../interfaces/RenderData";
+import { RenderData } from "../interfaces/RenderData";
 import { initializeUnlitPipeline } from "./pipes/unlitPipeline";
 import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 import { cUserAgent } from "../app/userAgent";
@@ -251,7 +251,7 @@ export class Renderer {
     }
   };
 
-  render = async (renderables: NewRenderData) => {
+  render = async (renderables: RenderData) => {
     const projection = mat4.create();
     mat4.perspective(
       projection,
@@ -262,7 +262,6 @@ export class Renderer {
     );
 
     const view = renderables.viewTransform;
-    console.log(renderables.modelTransforms);
 
     cUserAgent.device.queue.writeBuffer(
       this.objectBuffer,
@@ -317,56 +316,6 @@ export class Renderer {
       renderpass.draw(renderable.mesh!.vertexCount, 1, 0, objectsDrawn);
       objectsDrawn++;
     });
-
-    // Triangles
-    // renderpass.setVertexBuffer(0, cMeshLibrary.get("triangleMesh")!.buffer);
-    // renderpass.setBindGroup(
-    //   1,
-    //   cMaterialLibrary.get("triangleMaterial")!.bindGroup
-    // );
-    // renderpass.draw(
-    //   cMeshLibrary.get("triangleMesh")!.vertexCount,
-    //   renderables.objectCounts[objectTypes.TRIANGLE],
-    //   0,
-    //   objectsDrawn
-    // );
-    // objectsDrawn += renderables.objectCounts[objectTypes.TRIANGLE];
-
-    // // Quads
-    // renderpass.setVertexBuffer(0, cMeshLibrary.get("quadMesh")!.buffer);
-    // renderpass.setBindGroup(1, cMaterialLibrary.get("quadMaterial")!.bindGroup);
-    // renderpass.draw(
-    //   cMeshLibrary.get("quadMesh")!.vertexCount,
-    //   renderables.objectCounts[objectTypes.QUAD],
-    //   0,
-    //   objectsDrawn
-    // );
-    // objectsDrawn += renderables.objectCounts[objectTypes.QUAD];
-
-    // // Cube
-    // renderpass.setVertexBuffer(0, cMeshLibrary.get("cubeMesh")!.buffer);
-    // renderpass.setBindGroup(1, cMaterialLibrary.get("cubeMaterial")!.bindGroup);
-    // renderpass.draw(
-    //   cMeshLibrary.get("cubeMesh")!.vertexCount,
-    //   1,
-    //   0,
-    //   objectsDrawn
-    // );
-    // objectsDrawn += 1;
-
-    // // FIXME: [temporary]
-    // renderpass.setVertexBuffer(0, cMeshLibrary.get("dingus")!.buffer);
-    // renderpass.setBindGroup(
-    //   1,
-    //   cMaterialLibrary.get("dingusMaterial")!.bindGroup
-    // );
-    // renderpass.draw(
-    //   cMeshLibrary.get("dingus")!.vertexCount,
-    //   1,
-    //   0,
-    //   objectsDrawn
-    // );
-    // objectsDrawn += 1;
 
     renderpass.end();
 

@@ -16,7 +16,7 @@ export class App {
   scene: Scene;
 
   // FIXME: temp
-  testObjMesh!: ObjMesh;
+  //testObjMesh!: ObjMesh;
 
   // FIXME: reorganize querying HTML Elements do display debug info
   // FIXME: move HTMLElement to separate object/function/singleton
@@ -72,10 +72,10 @@ export class App {
   }
 
   async init() {
+    // TODO: Move assets initialization from Renderer
     await this.renderer.init();
     await this.scene.initFromJSON("./data/default.scene.json");
-    console.log(this.scene.getNewRenderables());
-    this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj"); //FIXME: temp
+    //this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj"); //FIXME: temp
   }
 
   run = () => {
@@ -104,20 +104,20 @@ export class App {
           : 0)
     );
 
-    this.renderer.render(this.scene.getNewRenderables());
+    this.renderer.render(this.scene.getRenderables());
 
     this._printDebugInfo();
 
     if (running) {
       requestAnimationFrame(this.run);
       // FIXME: temp
-      const intersectionResult = rayIntersectionTest(
-        this.scene.player.position,
-        this.scene.player.forward,
-        this.testObjMesh,
-        new BasicModel(vec3.fromValues(-5, 0, 0.5)).update().getModel()
-      );
-      if (intersectionResult) console.log(intersectionResult.distance);
+      // const intersectionResult = rayIntersectionTest(
+      //   this.scene.player.position,
+      //   this.scene.player.forward,
+      //   this.testObjMesh,
+      //   new BasicModel(vec3.fromValues(-5, 0, 0.5)).update().getModel()
+      // );
+      // if (intersectionResult) console.log(intersectionResult.distance);
     }
   };
 
