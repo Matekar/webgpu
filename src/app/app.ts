@@ -40,19 +40,17 @@ export class App {
     this.renderer = new Renderer();
     this.scene = new Scene();
 
-    this.keyLabel = <HTMLElement>document.querySelector("#key_label");
-    this.mouseXLabel = <HTMLElement>document.querySelector("#mouse_x_label");
-    this.mouseYLabel = <HTMLElement>document.querySelector("#mouse_y_label");
+    this.keyLabel = document.querySelector("#key_label")!;
+    this.mouseXLabel = document.querySelector("#mouse_x_label")!;
+    this.mouseYLabel = document.querySelector("#mouse_y_label")!;
     // prettier-ignore
-    this.cameraPositionLabel = <HTMLElement>(document.querySelector("#camera_position_label"));
+    this.cameraPositionLabel = document.querySelector("#camera_position_label")!;
     // prettier-ignore
-    this.cameraOrientationLabel = <HTMLElement>(document.querySelector("#camera_orientation_label"));
+    this.cameraOrientationLabel = document.querySelector("#camera_orientation_label")!;
     // prettier-ignore
-    this.cameraForwardsLabel = <HTMLElement>(document.querySelector("#camera_forwards_label"));
-    // prettier-ignore
-    this.cameraRightLabel = <HTMLElement>(document.querySelector("#camera_right_label"));
-    // prettier-ignore
-    this.cameraUpLabel = <HTMLElement>(document.querySelector("#camera_up_label"));
+    this.cameraForwardsLabel = document.querySelector("#camera_forwards_label")!;
+    this.cameraRightLabel = document.querySelector("#camera_right_label")!;
+    this.cameraUpLabel = document.querySelector("#camera_up_label")!;
 
     document.addEventListener("keydown", (event) => this._handleKeydown(event));
     document.addEventListener("keyup", (event) => this._handleKeyup(event));
