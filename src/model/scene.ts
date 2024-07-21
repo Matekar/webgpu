@@ -3,20 +3,20 @@ import { RenderData } from "../interfaces/RenderData";
 import { BasicModel } from "./basicModel";
 import { Camera } from "./camera";
 
-import { vec3 } from "gl-matrix";
+import { vec3, vec4 } from "gl-matrix";
 import { cMaterialLibrary, cMeshLibrary } from "../utility/AssetLibraries";
 import { Renderable } from "../interfaces/Renderable";
 import { SceneData } from "../interfaces/SceneData";
 
 export class Scene {
+  clearValue: vec4;
   renderables: Renderable[];
-
-  player!: Camera;
   objectData: Float32Array;
+  player!: Camera;
 
   constructor() {
+    this.clearValue = vec4.fromValues(0.8, 0.8, 0.8, 1.0);
     this.renderables = [];
-
     this.objectData = new Float32Array(16 * 1024);
   }
 
@@ -25,6 +25,8 @@ export class Scene {
     const json: SceneData = await res.json();
 
     console.log("Scene file by: " + json.author);
+
+    if (json.backgroundColor) this.clearValue = json.backgroundColor;
 
     this.player = new Camera(
       json.cameras[0].position,

@@ -1,17 +1,18 @@
 {
-  "author": "mk",
+  "author": "xSuMi",
   "version": "0.1",
   "license": "MIT",
+  "backgroundColor": [0.53, 0.81, 0.92, 1.0],
   "cameras": [
     {
-      "position": [-2, 0, 0.5],
+      "position": [-5, 0, 1],
       "rotation": [0, 0, 0]
     }
   ],
   "objects": [
     {
       "name": "Quad",
-      "position": [0.5, 0, 0.5],
+      "position": [0.5, 0.5, 0],
       "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "meshName": "quadMesh",
@@ -19,7 +20,7 @@
     },
     {
       "name": "Quad",
-      "position": [-0.5, 0, 0.5],
+      "position": [-0.5, 0.5, 0],
       "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "meshName": "quadMesh",
@@ -27,7 +28,7 @@
     },
     {
       "name": "Quad",
-      "position": [-0.5, 0, -0.5],
+      "position": [-0.5, -0.5, 0],
       "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "meshName": "quadMesh",
@@ -35,7 +36,7 @@
     },
     {
       "name": "Quad",
-      "position": [0.5, 0, -0.5],
+      "position": [0.5, -0.5, 0],
       "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "meshName": "quadMesh",
@@ -43,7 +44,7 @@
     },
     {
       "name": "Cube",
-      "position": [0, 1, 0],
+      "position": [0, 0, 1],
       "rotation": [0, 0, 0],
       "scale": [1, 1, 1],
       "meshName": "cubeMesh",
