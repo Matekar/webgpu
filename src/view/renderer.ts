@@ -13,6 +13,10 @@ import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 import { cUserAgent } from "../app/userAgent";
 import { cMaterialLibrary, cMeshLibrary } from "../utility/AssetLibraries";
 import { ObjMesh } from "./objMesh";
+import { commonPipelineInitializer } from "./pipes/commonPipelineInitialize";
+
+import unlitShader from "./shaders/basic.wgsl";
+import uiShader from "./shaders/ui.wgsl";
 
 export class Renderer {
   // Pipeline objects
@@ -24,6 +28,7 @@ export class Renderer {
   // Pipelines
   unlitPipeline!: GPURenderPipeline;
   wireframePipeline!: GPURenderPipeline;
+  uiPipeline!: GPURenderPipeline;
 
   // Clear value
   clearValue: GPUColor;
@@ -133,12 +138,14 @@ export class Renderer {
   };
 
   _initializePipelines = async () => {
-    this.unlitPipeline = initializeUnlitPipeline(
+    this.unlitPipeline = commonPipelineInitializer(
       cUserAgent.device,
       [this.frameGroupLayout, this.materialGroupLayout],
       [cMeshLibrary.get("triangleMesh")!.bufferLayout],
       cUserAgent.format,
-      this.depthStencilState
+      this.depthStencilState,
+      unlitShader,
+      "triangle-list"
     );
 
     this.wireframePipeline = initializeWireframePipeline(
@@ -147,6 +154,16 @@ export class Renderer {
       [cMeshLibrary.get("triangleMesh")!.bufferLayout],
       cUserAgent.format,
       this.depthStencilState
+    );
+
+    this.uiPipeline = commonPipelineInitializer(
+      cUserAgent.device,
+      [this.frameGroupLayout, this.materialGroupLayout],
+      [cMeshLibrary.get("triangleMesh")!.bufferLayout],
+      cUserAgent.format,
+      this.depthStencilState,
+      uiShader,
+      "triangle-list"
     );
   };
 
@@ -260,6 +277,7 @@ export class Renderer {
       0.1,
       10000
     );
+    console.log(projection);
 
     const view = renderables.viewTransform;
 
@@ -316,6 +334,9 @@ export class Renderer {
       renderpass.draw(renderable.mesh!.vertexCount, 1, 0, objectsDrawn);
       objectsDrawn++;
     });
+
+    renderpass.setPipeline(this.uiPipeline);
+    renderpass.draw(12, 1, 0, 0);
 
     renderpass.end();
 
