@@ -8,7 +8,6 @@ struct ObjectData {
 };
 
 @binding(0) @group(0) var<uniform> transformUBO: TransformData;
-@binding(1) @group(0) var<storage, read> objects: ObjectData;
 
 struct Wire {
   @builtin(position) Position : vec4<f32>,
@@ -21,7 +20,7 @@ fn vs_main(
   @location(0) vertexPosition: vec4<f32>,
   @location(1) fragmentPosition: vec4<f32>
 ) -> Wire {
-  var w = 16.0 / 10.0;
+  var w: f32 = transformUBO.projection[1][1] / transformUBO.projection[0][0];
 
   var pos = array<vec2<f32>, 12>(
     vec2<f32>(-0.02, -0.001 * w),
