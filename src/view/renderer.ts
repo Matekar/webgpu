@@ -8,8 +8,6 @@ import {
   triangleVertices,
 } from "./assets/vertices";
 import { RenderData } from "../interfaces/RenderData";
-import { initializeUnlitPipeline } from "./pipes/unlitPipeline";
-import { initializeWireframePipeline } from "./pipes/wireframePipeline";
 import { cUserAgent } from "../app/userAgent";
 import { cMaterialLibrary, cMeshLibrary } from "../utility/AssetLibraries";
 import { ObjMesh } from "./objMesh";
@@ -17,6 +15,7 @@ import { commonPipelineInitializer } from "./pipes/commonPipelineInitialize";
 
 import unlitShader from "./shaders/basic.wgsl";
 import uiShader from "./shaders/ui.wgsl";
+import wireframeShader from "./shaders/wireframe.wgsl";
 
 export class Renderer {
   // Pipeline objects
@@ -148,12 +147,14 @@ export class Renderer {
       "triangle-list"
     );
 
-    this.wireframePipeline = initializeWireframePipeline(
+    this.wireframePipeline = commonPipelineInitializer(
       cUserAgent.device,
       [this.frameGroupLayout],
       [cMeshLibrary.get("triangleMesh")!.bufferLayout],
       cUserAgent.format,
-      this.depthStencilState
+      this.depthStencilState,
+      wireframeShader,
+      "line-list"
     );
 
     this.uiPipeline = commonPipelineInitializer(
@@ -277,7 +278,6 @@ export class Renderer {
       0.1,
       10000
     );
-    console.log(projection);
 
     const view = renderables.viewTransform;
 
