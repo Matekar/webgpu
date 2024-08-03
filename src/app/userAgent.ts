@@ -33,4 +33,4 @@ class UserAgent {
 
 const cUserAgent = new UserAgent();
 
-export { cUserAgent };
+export default cUserAgent;

@@ -8,7 +8,7 @@ import {
   triangleVertices,
 } from "./assets/vertices";
 import { RenderData } from "../interfaces/RenderData";
-import { cUserAgent } from "../app/userAgent";
+import cUserAgent from "../app/userAgent";
 import { cMaterialLibrary, cMeshLibrary } from "../utility/AssetLibraries";
 import { ObjMesh } from "./objMesh";
 import { commonPipelineInitializer } from "./pipes/commonPipelineInitialize";

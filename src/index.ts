@@ -1,5 +1,5 @@
 import { App } from "./app/app";
-import { cUserAgent } from "./app/userAgent";
+import cUserAgent from "./app/userAgent";
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>(
   document.querySelector("#gfx-main")

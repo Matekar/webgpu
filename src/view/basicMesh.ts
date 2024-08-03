@@ -1,4 +1,4 @@
-import { cUserAgent } from "../app/userAgent";
+import cUserAgent from "../app/userAgent";
 import { Mesh } from "../interfaces/Mesh";
 import { RenderMode } from "../interfaces/enums";
 import { VERTEX_LENGTH, toLineList } from "./assets/vertices";
