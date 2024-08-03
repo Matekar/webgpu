@@ -33,10 +33,9 @@ export class App {
       this.canvas.requestPointerLock();
       // this.canvas.requestFullscreen();
     });
-    this.canvas.addEventListener("mousemove", (event) => {
-      if (document.pointerLockElement === this.canvas)
-        this._handleMousemove(event);
-    });
+    this.canvas.addEventListener("mousemove", (event) =>
+      this._handleMousemove(event)
+    );
   }
 
   async init() {
@@ -116,6 +115,7 @@ export class App {
       [event.movementX, event.movementY]
     );
 
-    this.scene.spinPlayer(event.movementX * 0.2, event.movementY * 0.2);
+    if (document.pointerLockElement === this.canvas)
+      this.scene.spinPlayer(event.movementX * 0.2, event.movementY * 0.2);
   }
 }
