@@ -16,13 +16,20 @@ import { commonPipelineInitializer } from "./pipes/commonPipelineInitialize";
 import unlitShader from "./shaders/basic.wgsl";
 import uiShader from "./shaders/ui.wgsl";
 import wireframeShader from "./shaders/wireframe.wgsl";
+import { rayIntersectionTest } from "../utility/mathUtilities";
+import { Scene } from "../model/scene";
 
 export class Renderer {
   // Pipeline objects
-  uniformBuffer!: GPUBuffer;
   frameGroupLayout!: GPUBindGroupLayout;
-  materialGroupLayout!: GPUBindGroupLayout;
   frameBindGroup!: GPUBindGroup;
+  uniformBuffer!: GPUBuffer;
+  objectBuffer!: GPUBuffer;
+
+  // Flags buffer
+  flagsGroupLayout!: GPUBindGroupLayout;
+  flagsBindGroup!: GPUBindGroup;
+  flagsBuffer!: GPUBuffer;
 
   // Pipelines
   unlitPipeline!: GPURenderPipeline;
@@ -42,11 +49,11 @@ export class Renderer {
   depthStencilAttachment!: GPURenderPassDepthStencilAttachment;
 
   // assets
+  materialGroupLayout!: GPUBindGroupLayout;
   triangleMaterial!: Material;
   quadMaterial!: Material;
   blankMaterial!: Material;
   dingusMaterial!: Material; // FIXME: [temporary]
-  objectBuffer!: GPUBuffer;
 
   constructor() {
     this.clearValue = { r: 0.8, g: 0.8, b: 0.8, a: 1.0 };
@@ -134,6 +141,19 @@ export class Renderer {
         },
       ],
     });
+
+    this.flagsGroupLayout = cUserAgent.device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX,
+          buffer: {
+            type: "read-only-storage",
+            hasDynamicOffset: false,
+          },
+        },
+      ],
+    });
   };
 
   _initializePipelines = async () => {
@@ -206,6 +226,11 @@ export class Renderer {
     };
     this.objectBuffer = cUserAgent.device.createBuffer(modelBufferDescriptor);
 
+    this.flagsBuffer = cUserAgent.device.createBuffer({
+      size: 4,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
     await this.triangleMaterial.init(
       cUserAgent.device,
       "./img/chat.jpg",
@@ -250,6 +275,18 @@ export class Renderer {
         },
       ],
     });
+
+    this.flagsBindGroup = cUserAgent.device.createBindGroup({
+      layout: this.flagsGroupLayout,
+      entries: [
+        {
+          binding: 0,
+          resource: {
+            buffer: this.flagsBuffer,
+          },
+        },
+      ],
+    });
   };
 
   switchPipeline = async (mode: RenderMode) => {
@@ -269,7 +306,9 @@ export class Renderer {
     }
   };
 
-  render = async (renderables: RenderData) => {
+  render = async (scene: Scene) => {
+    const renderables = scene.getRenderables();
+
     const projection = mat4.create();
     mat4.perspective(
       projection,
@@ -288,6 +327,7 @@ export class Renderer {
       0,
       renderables.modelTransforms.length
     );
+
     cUserAgent.device.queue.writeBuffer(
       this.uniformBuffer,
       0,
@@ -297,6 +337,12 @@ export class Renderer {
       this.uniformBuffer,
       64,
       <Float32Array>projection
+    );
+
+    cUserAgent.device.queue.writeBuffer(
+      this.flagsBuffer,
+      0,
+      new Float32Array([1])
     );
 
     const commandEncoder: GPUCommandEncoder =
@@ -326,6 +372,7 @@ export class Renderer {
         break;
     }
     renderpass.setBindGroup(0, this.frameBindGroup);
+    renderpass.setBindGroup(2, this.flagsBindGroup);
 
     let objectsDrawn: number = 0;
     renderables.renderables.forEach((renderable) => {

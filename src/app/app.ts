@@ -68,7 +68,7 @@ export class App {
           : 0)
     );
 
-    this.renderer.render(this.scene.getRenderables());
+    this.renderer.render(this.scene);
 
     cDebugInfo.printDebugInfo(this.scene, this.moveMap);
 
