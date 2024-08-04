@@ -11,9 +11,6 @@ export class App {
   // FIXME: temp
   //testObjMesh!: ObjMesh;
 
-  // FIXME: reorganize querying HTML Elements do display debug info
-  // FIXME: move HTMLElement to separate object/function/singleton
-
   moveMap: Map<String, Boolean>;
   acceleration: number;
 

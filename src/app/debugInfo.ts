@@ -2,6 +2,7 @@ import { Scene } from "../model/scene";
 import { rad2deg, vecsToRotation } from "../utility/mathUtilities";
 
 class DebugInfo {
+  // pressed keys info
   keyLabel: HTMLElement;
 
   // mouse info
