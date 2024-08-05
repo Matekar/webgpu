@@ -20,7 +20,10 @@ export class ObjMesh extends BasicMesh {
   }
 
   override initFromVertexArray(vertices: Float32Array): ObjMesh {
-    return super.initFromVertexArray(vertices) as ObjMesh;
+    super.initFromVertexArray(vertices);
+    this._expand();
+    console.log(this.v);
+    return this;
   }
 
   async initFromFile(url: string): Promise<ObjMesh> {
@@ -102,7 +105,35 @@ export class ObjMesh extends BasicMesh {
   };
 
   // Float32Array => v: vec4, vt: vec2
-  _expand = (): void => {
-    throw new Error("Method not implemented.");
+  _expand = (): ObjMesh => {
+    const vArray = new Array<vec4>();
+    const vtArray = new Array<vec2>();
+
+    for (
+      let i = 0;
+      i < this._primitiveTriangleListVertices.length;
+      i += this.vertexSize
+    ) {
+      const face: Face = Face.create();
+      face.v = vec4.fromValues(
+        this._primitiveTriangleListVertices[i],
+        this._primitiveTriangleListVertices[i + 1],
+        this._primitiveTriangleListVertices[i + 2],
+        this._primitiveTriangleListVertices[i + 3]
+      );
+      if (!vArray.find((v) => vec4.equals(v, face.v))) vArray.push(face.v);
+      face.vt = vec2.fromValues(
+        this._primitiveTriangleListVertices[i + 4],
+        this._primitiveTriangleListVertices[i + 5]
+      );
+      if (!vtArray.find((vt) => vec2.equals(vt, face.vt)))
+        vtArray.push(face.vt);
+      this.f.push(face);
+    }
+
+    this.v = vArray;
+    this.vt = vtArray;
+
+    return this;
   };
 }

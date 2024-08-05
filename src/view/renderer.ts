@@ -191,15 +191,15 @@ export class Renderer {
   _createMeshes = async () => {
     cMeshLibrary.set(
       "triangleMesh",
-      new BasicMesh().initFromVertexArray(triangleVertices)
+      new ObjMesh().initFromVertexArray(triangleVertices)
     );
     cMeshLibrary.set(
       "quadMesh",
-      new BasicMesh().initFromVertexArray(quadVertices)
+      new ObjMesh().initFromVertexArray(quadVertices)
     );
     cMeshLibrary.set(
       "cubeMesh",
-      new BasicMesh().initFromVertexArray(cubeVertices)
+      new ObjMesh().initFromVertexArray(cubeVertices)
     );
 
     // FIXME: [temporary]
