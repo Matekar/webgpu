@@ -1,5 +1,5 @@
 import { Material } from "./material";
-import { mat4 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { RenderMode } from "../interfaces/enums";
 import { BasicMesh } from "./basicMesh";
 import {
@@ -159,7 +159,7 @@ export class Renderer {
   _initializePipelines = async () => {
     this.unlitPipeline = commonPipelineInitializer(
       cUserAgent.device,
-      [this.frameGroupLayout, this.materialGroupLayout],
+      [this.frameGroupLayout, this.materialGroupLayout, this.flagsGroupLayout],
       [cMeshLibrary.get("triangleMesh")!.bufferLayout],
       cUserAgent.format,
       this.depthStencilState,
@@ -227,8 +227,8 @@ export class Renderer {
     this.objectBuffer = cUserAgent.device.createBuffer(modelBufferDescriptor);
 
     this.flagsBuffer = cUserAgent.device.createBuffer({
-      size: 4,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      size: 4 * 1024,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
 
     await this.triangleMaterial.init(
@@ -339,12 +339,6 @@ export class Renderer {
       <Float32Array>projection
     );
 
-    cUserAgent.device.queue.writeBuffer(
-      this.flagsBuffer,
-      0,
-      new Float32Array([1])
-    );
-
     const commandEncoder: GPUCommandEncoder =
       cUserAgent.device.createCommandEncoder();
     const textureView: GPUTextureView = cUserAgent.context
@@ -372,10 +366,35 @@ export class Renderer {
         break;
     }
     renderpass.setBindGroup(0, this.frameBindGroup);
+
+    const highlight = { index: -1, distance: Infinity };
+    renderables.renderables.forEach((renderable, index) => {
+      const testResult = rayIntersectionTest(
+        scene.player.position,
+        scene.player.forward,
+        renderable.mesh! as ObjMesh,
+        renderable.model.getModel()
+      );
+
+      // FIXME: Add default output to rIT
+      if (testResult && testResult?.distance < highlight.distance) {
+        highlight.index = index;
+        highlight.distance = testResult.distance;
+      }
+    });
+
+    cUserAgent.device.queue.writeBuffer(
+      this.flagsBuffer,
+      0,
+      new Float32Array(1024)
+        .fill(1.0)
+        .with(highlight.index, 0.15 * Math.sin(Date.now() / 180) + 1.0)
+    );
+
     renderpass.setBindGroup(2, this.flagsBindGroup);
 
     let objectsDrawn: number = 0;
-    renderables.renderables.forEach((renderable) => {
+    renderables.renderables.forEach((renderable, index) => {
       renderpass.setVertexBuffer(0, renderable.mesh!.buffer);
       renderpass.setBindGroup(1, renderable.material!.bindGroup);
       renderpass.draw(renderable.mesh!.vertexCount, 1, 0, objectsDrawn);

@@ -13,9 +13,12 @@ struct ObjectData {
 @binding(0) @group(1) var myTexture: texture_2d<f32>;
 @binding(1) @group(1) var mySampler: sampler;
 
+@binding(0) @group(2) var<storage, read> highlightFlag: array<f32>;
+
 struct Fragment {
   @builtin(position) Position : vec4<f32>,
-  @location(0) TexCoord : vec2<f32>
+  @location(0) TexCoord : vec2<f32>,
+  @location(1) ID : u32
 };
 
 @vertex
@@ -30,11 +33,15 @@ fn vs_main(
                   * objects.model[ID]
                   * vertexPosition;
   output.TexCoord = vertexTexCoord;
+  output.ID = ID;
 
   return output;
 }
 
 @fragment
-fn fs_main(@location(0) TexCoord : vec2<f32>) -> @location(0) vec4<f32> {
-  return textureSample(myTexture, mySampler, TexCoord);
+fn fs_main(
+  @location(0) TexCoord : vec2<f32>,
+  @location(1) ID : u32
+) -> @location(0) vec4<f32> {
+  return textureSample(myTexture, mySampler, TexCoord) * vec4<f32>(highlightFlag[ID], highlightFlag[ID], highlightFlag[ID], 1.0);
 }
