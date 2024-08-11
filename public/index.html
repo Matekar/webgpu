@@ -14,11 +14,19 @@
         overflow: hidden;
       }
 
-      #float {
+      .float {
         background-color: rgba(240, 240, 240, 0.3);
-        padding: 20px;
+        padding: 10px;
         position: absolute;
+      }
+
+      #topLeft {
         top: 10px;
+        left: 10px;
+      }
+
+      #bottomLeft {
+        bottom: 10px;
         left: 10px;
       }
 
@@ -32,7 +40,7 @@
       <canvas id="gfx-main" width="1920" height="1080"></canvas>
     </div>
 
-    <div id="float">
+    <div id="topLeft" class="float">
       <pre id="key_label"></pre>
       <pre id="mouse_position_label">Mouse position (XY): 0,0</pre>
       <pre id="mouse_acceleration_label">Mouse acceleration (XY): 0,0</pre>
@@ -41,6 +49,10 @@
       <pre id="camera_forwards_label"></pre>
       <pre id="camera_right_label"></pre>
       <pre id="camera_up_label"></pre>
+    </div>
+
+    <div id="bottomLeft" class="float">
+      <pre id="objectName"></pre>
     </div>
   </body>
 </html>

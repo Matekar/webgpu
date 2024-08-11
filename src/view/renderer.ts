@@ -18,6 +18,7 @@ import uiShader from "./shaders/ui.wgsl";
 import wireframeShader from "./shaders/wireframe.wgsl";
 import { rayIntersectionTest } from "../utility/mathUtilities";
 import { Scene } from "../model/scene";
+import cDebugInfo from "../app/debugInfo";
 
 export class Renderer {
   // Pipeline objects
@@ -382,6 +383,13 @@ export class Renderer {
         highlight.distance = testResult.distance;
       }
     });
+
+    if (highlight.index === -1)
+      cDebugInfo.displayHighlitedName("Nothing in view");
+    else
+      cDebugInfo.displayHighlitedName(
+        renderables.renderables[highlight.index].name
+      );
 
     cUserAgent.device.queue.writeBuffer(
       this.flagsBuffer,

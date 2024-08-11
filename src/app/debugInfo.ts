@@ -9,6 +9,7 @@ class DebugInfo {
   mousePositionLabel: HTMLElement;
   mouseAccelerationLabel: HTMLElement;
 
+  // topLeft
   // camera info
   cameraPositionLabel: HTMLElement;
   cameraOrientationLabel: HTMLElement;
@@ -16,15 +17,22 @@ class DebugInfo {
   cameraRightLabel: HTMLElement;
   cameraUpLabel: HTMLElement;
 
+  // bottomLeft
+  objectNameLabel: HTMLElement;
+
   constructor() {
     this.keyLabel = this.queryOne("#key_label")!;
+
     this.mousePositionLabel = this.queryOne("#mouse_position_label")!;
     this.mouseAccelerationLabel = this.queryOne("#mouse_acceleration_label")!;
+
     this.cameraPositionLabel = this.queryOne("#camera_position_label")!;
     this.cameraOrientationLabel = this.queryOne("#camera_orientation_label")!;
     this.cameraForwardsLabel = this.queryOne("#camera_forwards_label")!;
     this.cameraRightLabel = this.queryOne("#camera_right_label")!;
     this.cameraUpLabel = this.queryOne("#camera_up_label")!;
+
+    this.objectNameLabel = this.queryOne("#objectName")!;
   }
 
   queryOne = (selector: string): HTMLElement =>
@@ -36,6 +44,9 @@ class DebugInfo {
     this.mouseAccelerationLabel.innerHTML =
       "Mouse acceleration (XY): " + acceleration.toString();
   };
+
+  displayHighlitedName = (name: string) =>
+    (this.objectNameLabel.innerHTML = name);
 
   printDebugInfo = (scene: Scene, moveMap: Map<String, Boolean>) => {
     this.keyLabel.innerText = "Current keys: [";

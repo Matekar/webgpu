@@ -35,6 +35,7 @@ export class Scene {
 
     for (let object of json.objects) {
       this.appendRenderable({
+        name: object.name,
         model: new BasicModel(object.position),
         mesh: cMeshLibrary.get(object.meshName),
         material: object.materialName
