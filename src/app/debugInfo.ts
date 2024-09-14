@@ -1,5 +1,6 @@
 import { Scene } from "../model/scene";
 import { rad2deg, vecsToRotation } from "../utility/mathUtilities";
+import cEditorState from "./editorState";
 
 class DebugInfo {
   // pressed keys info
@@ -45,8 +46,11 @@ class DebugInfo {
       "Mouse acceleration (XY): " + acceleration.toString();
   };
 
-  displayHighlitedName = (name: string) =>
-    (this.objectNameLabel.innerHTML = name);
+  // TODO: Rewrite
+  displayHighlitedName = () =>
+    (this.objectNameLabel.innerHTML = cEditorState.getHighlighted()
+      ? cEditorState.getHighlighted()!.name
+      : "");
 
   printDebugInfo = (scene: Scene, moveMap: Map<String, Boolean>) => {
     this.keyLabel.innerText = "Current keys: [";

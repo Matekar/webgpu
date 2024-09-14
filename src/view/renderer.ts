@@ -1,13 +1,11 @@
 import { Material } from "./material";
 import { mat4, vec3 } from "gl-matrix";
 import { RenderMode } from "../interfaces/enums";
-import { BasicMesh } from "./basicMesh";
 import {
   cubeVertices,
   quadVertices,
   triangleVertices,
 } from "./assets/vertices";
-import { RenderData } from "../interfaces/RenderData";
 import cUserAgent from "../app/userAgent";
 import { cMaterialLibrary, cMeshLibrary } from "../utility/AssetLibraries";
 import { ObjMesh } from "./objMesh";
@@ -19,6 +17,8 @@ import wireframeShader from "./shaders/wireframe.wgsl";
 import { rayIntersectionTest } from "../utility/mathUtilities";
 import { Scene } from "../model/scene";
 import cDebugInfo from "../app/debugInfo";
+import cEditorState from "../app/editorState";
+import { Renderable } from "../interfaces/Renderable";
 
 export class Renderer {
   // Pipeline objects
@@ -368,7 +368,12 @@ export class Renderer {
     }
     renderpass.setBindGroup(0, this.frameBindGroup);
 
-    const highlight = { index: -1, distance: Infinity };
+    const highlight = {
+      index: -1,
+      renderable: undefined as Renderable | undefined,
+      distance: Infinity,
+      point: vec3.create(),
+    };
     renderables.renderables.forEach((renderable, index) => {
       const testResult = rayIntersectionTest(
         scene.player.position,
@@ -380,16 +385,19 @@ export class Renderer {
       // FIXME: Add default output to rIT
       if (testResult && testResult?.distance < highlight.distance) {
         highlight.index = index;
+        highlight.renderable = renderable;
         highlight.distance = testResult.distance;
+        highlight.point = testResult.point;
       }
     });
 
-    if (highlight.index === -1)
-      cDebugInfo.displayHighlitedName("Nothing in view");
-    else
-      cDebugInfo.displayHighlitedName(
-        renderables.renderables[highlight.index].name
-      );
+    if (highlight.index === -1) {
+      cEditorState.setHighlighted(undefined);
+      cDebugInfo.displayHighlitedName();
+    } else {
+      cEditorState.setHighlighted(highlight.renderable);
+      cDebugInfo.displayHighlitedName();
+    }
 
     cUserAgent.device.queue.writeBuffer(
       this.flagsBuffer,
