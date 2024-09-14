@@ -9,7 +9,7 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
-    "@webgpu/types": "^0.1.40",
+    "@webgpu/types": "^0.1.45",
     "gl-matrix": "^3.4.3"
   }
 }
