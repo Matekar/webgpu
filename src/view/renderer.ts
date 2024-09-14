@@ -393,10 +393,10 @@ export class Renderer {
 
     if (highlight.index === -1) {
       cEditorState.setHighlighted(undefined);
-      cDebugInfo.displayHighlitedName();
+      cDebugInfo.displayHighlightedName();
     } else {
       cEditorState.setHighlighted(highlight.renderable);
-      cDebugInfo.displayHighlitedName();
+      cDebugInfo.displayHighlightedName();
     }
 
     cUserAgent.device.queue.writeBuffer(
@@ -417,6 +417,7 @@ export class Renderer {
       objectsDrawn++;
     });
 
+    // TODO: Replace with proper UI drawing
     renderpass.setPipeline(this.uiPipeline);
     renderpass.draw(12, 1, 0, 0);
 

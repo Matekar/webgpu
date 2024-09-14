@@ -2,6 +2,7 @@ import { Renderer } from "../view/renderer";
 import { Scene } from "../model/scene";
 import { RenderMode } from "../interfaces/enums";
 import cDebugInfo from "./debugInfo";
+import cEditorState from "./editorState";
 
 export class App {
   canvas: HTMLCanvasElement;
@@ -26,9 +27,10 @@ export class App {
 
     this.acceleration = 3;
 
-    this.canvas.addEventListener("click", () => {
+    this.canvas.addEventListener("click", (event) => {
       this.canvas.requestPointerLock();
       // this.canvas.requestFullscreen();
+      this._handleMouseclick(event);
     });
     this.canvas.addEventListener("mousemove", (event) =>
       this._handleMousemove(event)
@@ -114,5 +116,11 @@ export class App {
 
     if (document.pointerLockElement === this.canvas)
       this.scene.spinPlayer(event.movementX * 0.2, event.movementY * 0.2);
+  }
+
+  _handleMouseclick(event: MouseEvent) {
+    if (this.moveMap.get("AltLeft")) cEditorState.pushHighlightToSelected();
+    else cEditorState.setSelectedFromHighlighted();
+    cDebugInfo.displaySelectedNames();
   }
 }

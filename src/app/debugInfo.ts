@@ -1,3 +1,4 @@
+import { Renderable } from "../interfaces/Renderable";
 import { Scene } from "../model/scene";
 import { rad2deg, vecsToRotation } from "../utility/mathUtilities";
 import cEditorState from "./editorState";
@@ -19,7 +20,8 @@ class DebugInfo {
   cameraUpLabel: HTMLElement;
 
   // bottomLeft
-  objectNameLabel: HTMLElement;
+  highlightName: HTMLElement;
+  selectionNames: HTMLElement;
 
   constructor() {
     this.keyLabel = this.queryOne("#key_label")!;
@@ -33,7 +35,8 @@ class DebugInfo {
     this.cameraRightLabel = this.queryOne("#camera_right_label")!;
     this.cameraUpLabel = this.queryOne("#camera_up_label")!;
 
-    this.objectNameLabel = this.queryOne("#objectName")!;
+    this.highlightName = this.queryOne("#highlight");
+    this.selectionNames = this.queryOne("#selection");
   }
 
   queryOne = (selector: string): HTMLElement =>
@@ -47,10 +50,19 @@ class DebugInfo {
   };
 
   // TODO: Rewrite
-  displayHighlitedName = () =>
-    (this.objectNameLabel.innerHTML = cEditorState.getHighlighted()
+  displayHighlightedName = () =>
+    (this.highlightName.innerHTML = cEditorState.getHighlighted()
       ? cEditorState.getHighlighted()!.name
       : "");
+
+  // TODO: Rewrite
+  displaySelectedNames = () => {
+    this.selectionNames.innerHTML = cEditorState.getSelected()
+      ? cEditorState
+          .getSelected()
+          .reduce((acc, curr) => (acc += curr.name + ","), "")
+      : "";
+  };
 
   printDebugInfo = (scene: Scene, moveMap: Map<String, Boolean>) => {
     this.keyLabel.innerText = "Current keys: [";

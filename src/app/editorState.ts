@@ -24,13 +24,16 @@ class EditorState {
   public setSelectedFromHighlighted() {
     if (this._highlightedRenderable)
       this._selectedRenderables = [this._highlightedRenderable];
-    else console.error("ES1.1: Tried to set from undefined");
+    else console.warn("ES1.1: Tried to set from undefined");
   }
 
   public pushHighlightToSelected() {
-    if (this._highlightedRenderable)
+    if (
+      this._highlightedRenderable &&
+      !this._selectedRenderables.find((v) => v == this._highlightedRenderable)
+    )
       this._selectedRenderables.push(this._highlightedRenderable);
-    else console.error("ES1.2: Tried to push undefined");
+    else console.warn("ES1.2: Tried to push undefined");
   }
 
   public resetSelected() {
