@@ -9,9 +9,6 @@ export class App {
   renderer: Renderer;
   scene: Scene;
 
-  // FIXME: temp
-  //testObjMesh!: ObjMesh;
-
   moveMap: Map<String, Boolean>;
   acceleration: number;
 
@@ -41,7 +38,6 @@ export class App {
     // TODO: Move assets initialization from Renderer
     await this.renderer.init();
     await this.scene.initFromJSON("./data/default.scene.json");
-    //this.testObjMesh = await new ObjMesh().initFromFile("./data/cube.obj"); //FIXME: temp
   }
 
   run = () => {
@@ -76,14 +72,6 @@ export class App {
 
     if (running) {
       requestAnimationFrame(this.run);
-      // FIXME: temp
-      // const intersectionResult = rayIntersectionTest(
-      //   this.scene.player.position,
-      //   this.scene.player.forward,
-      //   this.testObjMesh,
-      //   new BasicModel(vec3.fromValues(-5, 0, 0.5)).update().getModel()
-      // );
-      // if (intersectionResult) console.log(intersectionResult.distance);
     }
   };
 
